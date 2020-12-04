@@ -9,7 +9,7 @@
 * 3. [Installation](#installation)
 
 ### General Info
-This extremely simplified repository contains all files required to maintain the Pictionary mini-game bot for discord authored by Ricky. This is a recreation of the worlds renowned mini-game we all love(pictionary) into discord.
+This extremely simplified repository contains all files required to maintain the Pictionary mini-game bot for discord authored by Ricky. This is a recreation of the worlds renowned mini-game we all love(pictionary) into discord. A game instance can be started on a server basis. Custom prefixes has also been implemented.
 
 ### Explanation 
 **=** A pictionary game is started when the lobby-making command is called, every participant is required to **prove** their **activity**. This, as of the latest update, is recoginized as replying `ready`. If any of the participants **fail** to prove activity within `30` seconds, the game will consequently fail to start.
