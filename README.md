@@ -12,7 +12,13 @@ This repository contains all files required to maintain the Pictionary mini-game
 
 **=** After **every** participant have proven their activity, the game will begin after 5 seconds. Chat will be **disabled** until the first drawing is submitted.
 
-**=** A member is then chosen to submit a drawing of a random theme. You can draw the theme on literally anything, you candraw it on a piece of paper, take a picture and DM the bot, you can draw the picture on MS paint and send the bot, literally anything!. If they **fail** to submit the picture within a time frame of `60 seconds`, they will recieve a deduction and the game will continue onto another person in queue. \n\n **=** If however the member **successfully** submitted the drawing, the other participants will have a timeframe of `70 seconds` to guess.\n\n**=** The first person to correctly answer will recieve a few points.\n\n**=** This process is repeated through every member and every rounds.
+**=** A member is then chosen to submit a drawing of a random theme. You can draw the theme on literally anything, you candraw it on a piece of paper, take a picture and DM the bot, you can draw the picture on MS paint and send the bot, literally anything!. If they **fail** to submit the picture within a time frame of `60 seconds`, they will recieve a deduction and the game will continue onto another person in queue. 
+
+**=** If however the member **successfully** submitted the drawing, the other participants will have a timeframe of `70 seconds` to guess.
+
+**=** The first person to correctly answer will recieve a few points.
+
+**=** This process is repeated through every member and every rounds.
 
 ### Installation
 To run this project, install it locally by following these steps:
