@@ -1,1 +1,1 @@
-//remove this and insert your token here
+#remove this and insert your token here
