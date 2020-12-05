@@ -47,5 +47,5 @@ py -3 -m pip install -U git+https://github.com/Rapptz/discord-ext-menus
 
 Insert the token of your bot instance into the text file.
 
-* 4. Run the bot instance and enjoy!
+* 4. Run the bot instance and enjoy! 
 
