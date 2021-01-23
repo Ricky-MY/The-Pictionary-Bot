@@ -1,20 +1,75 @@
 import discord
-from discord.ext import commands, tasks
+from discord.ext import commands
 import asyncio
 import random
 
 class Pictionary(commands.Cog):
 	def __init__(self, client):
 		self.client = client
+
+	''' ======= Pictionary =========
+	This is the main cog that every game loop will be in.
 	
+	Initiator - 'start'
+		- normal 
+		- custom
+	
+	A member checkup is done before bot enters the game loop.'''
+
+	async def ready_up(self, ctx, message, members, STARTING_SCORE, guess_time, draw_time):
+		color = 0x9494FF
+		scores = {}
+		for member in members:
+			scores[member.mention] = STARTING_SCORE
+			try: 
+				await message.edit(embed=discord.Embed(title='__**# Lobby**__', description = f'> {member.mention} Please reply ready.\n> \n> Guess Time = {guess_time} seconds\n> \n> Drawing Time = {draw_time} seconds\n> \n> No of Participants = {len(members)}', color = color))
+				await self.client.wait_for('message', check=lambda message : message.content.lower() == 'ready' and message.channel == ctx.channel and message.author == member, timeout = 30)
+			except asyncio.TimeoutError:
+				await message.edit(embed=discord.Embed(title='__**# Lobby**__', description = f'{member.mention} is inactive - Lobby failed to start.', color = discord.Color.dark_red()))
+				raise asyncio.TimeoutError
+		return scores
+
+	async def get_word(self, themes):
+		theme = random.choice(themes)
+		words_of_theme = list(theme)
+		blank_list = []
+		hinting_words = random.randint(0, (len(words_of_theme) // 2))
+		for i in words_of_theme:
+			if i == ' ':
+				blank_list.append('  ')
+			else:
+				if random.randint(0, 1) == 0 or hinting_words == 0:
+					blank_list.append(' _ ')
+				else:
+					blank_list.append(f' {i} ')
+					hinting_words -= 1
+		blank = ''.join(blank_list)
+		return blank, theme
+
+	async def build_score(self, scores, members):
+		scores = sorted(scores.items(), key=lambda x: x[1], reverse = True)
+		embed = discord.Embed(title= '__**# Scoreboard**__', color = 0x9494FF )
+		places = ['🥇','🥈','🥉', ':four:', ':five:',':six:', ':seven:', ':eight:', ':nine:', '🔟']
+		if len(members) >= 10:
+			count = 0
+			for i in range(0,10):
+				embed.add_field(name ='\u200b', value = f'{places[count]} : {scores[count][0]} : {scores[count][1]} pts', inline = False)
+				count += 1
+		elif len(members) < 10:
+			count = 0
+			for i in range(0,len(members)):
+				embed.add_field(name = '\u200b', value = f'{places[count]} : {scores[count][0]} : {scores[count][1]} pts',inline = False)
+				count += 1
+		return embed
+
 	@commands.group(invoke_without_command = True)
 	@commands.guild_only()
 	async def start(self, ctx):
-		await ctx.send('Please choose `normal/custom`!')
+		await ctx.send(embed=discord.Embed(title= "Setup" ,description=f'Please choose __**normal/custom**__ by using the following command\n\n> `{ctx.prefix}start custom <rounds> <draw_time> <guess_time> <participants>`\n> `{ctx.prefix}start normal <rounds> <participants>`', color = 0x9494FF))
 
 	@start.command()
-	@commands.guild_only()
 	async def normal(self, ctx, rounds : int = 1 , members : commands.Greedy[discord.Member] = None):
+		# Check up
 		if len(members) is None:
 			await ctx.send("You didn't specify any participants, please try again.")
 			return
@@ -25,6 +80,8 @@ class Pictionary(commands.Cog):
 			await ctx.send("You have way too many members to start a game!")
 			return
 
+		# Requirement satisifed
+
 		themes = ['Mom', 'Donald Trump', 'Joe Biden', 'apple', 'orange', 'merman', 'superman', 'thor', 'Timer', 'Paper', 'Pencils', 'Index cards', 'Dice', 'Angry', 'Fireworks', 'Pumpkin', 'Baby', 'Flower', 'Rainbow', 'Beard', 'Flying saucer', 'Recycle', 'Bible', 'Giraffe', 'Sand castle', 'Glasses', 'Snowflake', 'Book', 'High heel', 'Stairs', 'Bucket', 'Ice cream cone', 'Starfish', 'Bumble bee', 'Igloo', 'Strawberry', 'Butterfly', 'Lady bug', 'Sun', 'Camera', 'Lamp', 'Tire', 'Cat', 'Lion', 'Toast', 'Church', 'Mailbox', 'Toothbrush', 'Crayon', 'Night', 'Toothpaste', 'Dolphin', 'Nose', 'Truck', 'Egg', 'Olympics', 'Volleyball', 'Eiffel Tower', 'Peanut', 'Abraham Lincoln', 'Kiss', 'Pigtails', 'Brain', 'Kitten', 'Playground', 'Bubble bath', 'Kiwi', 'Pumpkin pie', 'Buckle', 'Lipstick', 'Raindrop', 'Bus', 'Lobster', 'Robot', 'Car accident', 'Lollipop', 'Sand castle', 'Castle', 'Magnet', 'Slipper', 'Chain saw', 'Megaphone', 'Snowball', 'Circus tent', 'Mermaid', 'Sprinkler', 'Computer', 'Minivan', 'Statue of Liberty', 'Crib', 'Mount Rushmore', 'Tadpole', 'Dragon', 'Music', 'Teepee', 'Dumbbell', 'North pole', 'Telescope', 'Eel', 'Nurse', 'Train', 'Ferris wheel', 'Owl', 'Tricycle', 'Flag', 'Pacifier', 'Tuk Tuk', 'Junk mail', 'Piano']
 		channel = ctx.channel
 		color = 0x9494FF
@@ -32,18 +89,15 @@ class Pictionary(commands.Cog):
 		GUESSING_TIME = 70
 		STARTING_SCORE = 0
 		BASIC_SCORE = 10
-		scores = {}
 		lobby_init = await ctx.send(embed=discord.Embed(title='__**# Lobby**__', description = f'> Starting in 3 seconds...\n> \n> Guess Time = 70 seconds\n> \n> Drawing Time = 60 seconds\n> \n> No of Participants = {len(members)}', color = color))
 		await asyncio.sleep(3)
 
-		for member in members:
-			scores[member.mention] = STARTING_SCORE
-			try: 
-				await lobby_init.edit(embed=discord.Embed(title='__**# Lobby**__', description = f'> {member.mention} Please reply ready.\n> \n> Guess Time = 70 seconds\n> \n> Drawing Time = 60 seconds\n> \n> No of Participants = {len(members)}', color = color))
-				msg = await self.client.wait_for('message', check=lambda message : message.content.lower() == 'ready' and message.channel == channel and message.author == member, timeout = 30)
-			except asyncio.TimeoutError:
-				await lobby_init.edit(embed=discord.Embed(title='__**# Lobby**__', description = f'{member.mention} is inactive - Lobby failed to start.', color = discord.Color.dark_red()))
-				return
+		# Ready-up protocol
+		try:
+			scores = await self.ready_up(ctx, lobby_init, members, STARTING_SCORE, GUESSING_TIME, DRAWING_TIME)
+		except asyncio.TimeoutError:
+			return
+		# Ends
 
 		main_embed = await channel.send(embed=discord.Embed(title = "All players ready.", color = color))
 		await asyncio.sleep(0.5)
@@ -56,22 +110,18 @@ class Pictionary(commands.Cog):
 			if i > 0:
 				await channel.send(embed = discord.Embed(title = "Game Update", description = f'Round : {i+1}', color= color))
 			for member in members:
-				theme = random.choice(themes)
-				words_of_theme = list(theme)
-				blank_list = []
-				for i in words_of_theme:
-					if i == ' ':
-						blank_list.append('  ')
-					else:
-						blank_list.append(' _ ')
-				blank = ''.join(blank_list)
-				
+				blank, theme = await self.get_word(themes)	
 				await channel.send(f"> Its {member.mention}'s turn, lets wait for them to submit their drawing!")
-				await member.send(embed = discord.Embed(title=f'Eyo, please draw "{theme}" in MS paint and send me a picture of it.', description='You only have 60 seconds so get it together son.', color = color))
+				try:
+					await member.send(embed = discord.Embed(title=f'Eyo, please draw "{theme}" in MS paint and send me a picture of it.', description='You only have 60 seconds so get it together son.', color = color))
+				except discord.errors.HTTPException:
+					await ctx.send(f"Unable to send requesting offer to the member {member}. Make sure to enable dms and restart the game!")
+					return
+
 				try:
 					msg = await self.client.wait_for('message', check=lambda message : len(message.attachments)> 0 and message.guild is None and message.author == member, timeout = DRAWING_TIME)
 				except asyncio.TimeoutError:
-					await member.send(f'60 seconds has elapsed and still no drawings, what a shame son.')
+					await member.send(f"60 seconds has elapsed and still no drawings, what a shame son.")
 					await channel.send(f"Son's lackin, too slow and couldn't submit in time, -{BASIC_SCORE} from your points {member.mention}")
 					scores[member.mention] -= BASIC_SCORE
 				else:
@@ -85,24 +135,11 @@ class Pictionary(commands.Cog):
 					else:
 						await ctx.send(f'{msg.author.mention} guessed it correctly. Not bad considering the brain cells count.')
 						scores[msg.author.mention] += BASIC_SCORE
-
-		scores = sorted(scores.items(), key=lambda x: x[1], reverse = True)
-		embed = discord.Embed(title= '__**# Scoreboard**__', color = color )
-		places = ['🥇','🥈','🥉', ':four:', ':five:',':six:', ':seven:', ':eight:', ':nine:', '🔟']
-		if len(members) >= 10:
-			count = 0
-			for i in range(0,10):
-				embed.add_field(name ='\u200b', value = f'{places[count]} : {scores[count][0]} : {scores[count][1]} pts', inline = False)
-				count += 1
-		elif len(members) < 10:
-			count = 0
-			for i in range(0,len(members)):
-				embed.add_field(name = '\u200b', value = f'{places[count]} : {scores[count][0]} : {scores[count][1]} pts',inline = False)
-				count += 1
+		embed = await self.build_score(scores, members)
 		await channel.send(embed=embed)
 
+
 	@start.command()
-	@commands.guild_only()
 	async def custom(self, ctx, rounds:int = 1, draw_time:int = 60, guess_time:int = 70, members:commands.Greedy[discord.Member]= None):
 		if len(members) is None:
 			await ctx.send("You didn't specify any participants, please try again.")
@@ -114,20 +151,18 @@ class Pictionary(commands.Cog):
 			await ctx.send("You have way too many members to start a game!")
 			return
 		themes = ['mom', 'stepsister', 'donald trump', 'nano tech', 'apple', 'orange', 'joe mama', 'pimp', 'superman', 'thor', 'Timer', 'Paper', 'Pencils', 'Index cards', 'Dice', 'Angry', 'Fireworks', 'Pumpkin', 'Baby', 'Flower', 'Rainbow', 'Beard', 'Flying saucer', 'Recycle', 'Bible', 'Giraffe', 'Sand castle', 'Bikini', 'Glasses', 'Snowflake', 'Book', 'High heel', 'Stairs', 'Bucket', 'Ice cream cone', 'Starfish', 'Bumble bee', 'Igloo', 'Strawberry', 'Butterfly', 'Lady bug', 'Sun', 'Camera', 'Lamp', 'Tire', 'Cat', 'Lion', 'Toast', 'Church', 'Mailbox', 'Toothbrush', 'Crayon', 'Night', 'Toothpaste', 'Dolphin', 'Nose', 'Truck', 'Egg', 'Olympics', 'Volleyball', 'Eiffel Tower', 'Peanut', 'Abraham Lincoln', 'Kiss', 'Pigtails', 'Brain', 'Kitten', 'Playground', 'Bubble bath', 'Kiwi', 'Pumpkin pie', 'Buckle', 'Lipstick', 'Raindrop', 'Bus', 'Lobster', 'Robot', 'Car accident', 'Lollipop', 'Sand castle', 'Castle', 'Magnet', 'Slipper', 'Chain saw', 'Megaphone', 'Snowball', 'Circus tent', 'Mermaid', 'Sprinkler', 'Computer', 'Minivan', 'Statue of Liberty', 'Crib', 'Mount Rushmore', 'Tadpole', 'Dragon', 'Music', 'Teepee', 'Dumbbell', 'North pole', 'Telescope', 'Eel', 'Nurse', 'Train', 'Ferris wheel', 'Owl', 'Tricycle', 'Flag', 'Pacifier', 'Tuk Tuk', 'Junk mail', 'Piano']
-		guild = ctx.guild
 		channel = ctx.channel
+		STARTING_SCORE = 0
 		color = 0x9494FF
 		scores = {}
 		lobby_init = await ctx.send(embed=discord.Embed(title='__**# Lobby**__', description = f'> Starting in 3 seconds...\n> \n> Guess Time = {guess_time} seconds\n> \n> Drawing Time = {draw_time} seconds\n> \n> No of Participants = {len(members)}', color = color))
 		await asyncio.sleep(3)
-		for member in members:
-			scores[member.mention] = 0
-			try: 
-				await lobby_init.edit(embed=discord.Embed(title='__**# Lobby**__', description = f'> {member.mention} Please reply ready.\n> \n> Guess Time = {guess_time} seconds\n> \n> Drawing Time = {draw_time} seconds\n> \n> No of Participants = {len(members)}', color = color))
-				msg = await self.client.wait_for('message', check=lambda message : message.content.lower() == 'ready' and message.channel == channel and message.author == member, timeout = 30)
-			except asyncio.TimeoutError:
-				await lobby_init.edit(embed=discord.Embed(title='__**# Lobby**__', description = f'{member.mention} is inactive - Lobby failed to start.', color = discord.Color.dark_red()))
-				return
+		# Ready-up protocol
+		try:
+			scores = await self.ready_up(ctx, lobby_init, members, STARTING_SCORE, guess_time, draw_time)
+		except asyncio.TimeoutError:
+			return
+
 		main_embed = await ctx.send(embed=discord.Embed(title = "All players ready.", color = color))
 		await asyncio.sleep(0.5)
 		to_be_edited = await ctx.send('> Game is starting in `5` seconds....')
@@ -138,15 +173,7 @@ class Pictionary(commands.Cog):
 			if i > 0:
 				await channel.send(embed = discord.Embed(title = "Game Update", description = f'Round : {i+1}', color= color))
 			for member in members:
-				theme = random.choice(themes)
-				words = list(theme)
-				blank_list = []
-				for i in words:
-					if i == ' ':
-						blank_list.append('  ')
-					else:
-						blank_list.append(' _ ')
-				blank = ''.join(blank_list)
+				blank, theme = await self.get_word(themes)
 				await channel.send(f"> Its {member.mention}'s turn, lets wait for them to submit their drawing!")
 				await member.send(embed = discord.Embed(title=f'Eyo, please draw "{theme}" in MS paint and send me a picture of it.', description=f'You only have {draw_time} seconds so get it together son.', color = color))
 				try:
@@ -166,21 +193,8 @@ class Pictionary(commands.Cog):
 					else:
 						await ctx.send(f"{msg.author.mention} guessed it correctly. Fair play peanut! Here's 🔟 pts")
 						scores[msg.author.mention] += 10
-		scores = sorted(scores.items(), key=lambda x: x[1], reverse = True)
-		embed = discord.Embed(title= '__**# Scoreboard**__', color = color )
-		places = ['🥇','🥈','🥉', ':four:', ':five:',':six:', ':seven:', ':eight:', ':nine:', '🔟']
-		if len(members) >= 10:
-			count = 0
-			for i in range(0,10):
-				embed.add_field(name ='\u200b', value = f'{places[count]} : {scores[count][0]} : {scores[count][1]} pts', inline = False)
-				count += 1
-		elif len(members) < 10:
-			count = 0
-			for i in range(0,len(members)):
-				embed.add_field(name = '\u200b', value = f'{places[count]} : {scores[count][0]} : {scores[count][1]} pts',inline = False)
-				count += 1
+		embed = await self.build_score(scores, members)
 		await channel.send(embed=embed)
-
 
 def setup(client):
 	client.add_cog(Pictionary(client))

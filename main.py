@@ -18,6 +18,8 @@ def get_prefix(client, message):
 		with open('prefixes.json', 'w') as f:
 			json.dump(prefixes, f, indent=4)
 		return commands.when_mentioned_or(prefixes[str(message.guild.id)])(client, message)
+	except AttributeError:
+		pass
 
 client = commands.Bot(command_prefix=get_prefix, intents = intents)
 client.remove_command('help')
@@ -31,7 +33,7 @@ async def shutdown(ctx):
 
 @client.event
 async def on_ready():
-	print("Pictionary is on standby")
+	print("________________________________________________________________________________________________________________________\nPictionary is on standby\n________________________________________________________________________________________________________________________")
 	await client.change_presence(status=discord.Status.online, activity=discord.Game(f'Pictionary : {len(client.guilds)} guilds'))
 
 for filename in os.listdir('./cogs'):

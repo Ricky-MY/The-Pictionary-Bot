@@ -1,13 +1,12 @@
 import discord
-import json
 import os
 from discord.ext import commands, tasks
-
 
 class Admin(commands.Cog):
 
 	def __init__(self, client):
 		self.client = client
+		self.color = 0x9494FF
 
 	def botAdminCheck(ctx):
 		return ctx.message.author.id == 368671236370464769 # change this number to your ID
@@ -17,10 +16,9 @@ class Admin(commands.Cog):
 	@commands.guild_only()
 	@commands.check(botAdminCheck)
 	async def guilds(self, ctx):
-		color = 0x9494FF
 		count = 0
 		inGuilds = self.client.guilds
-		embed = discord.Embed(title="Guilds Joined", colour=color)
+		embed = discord.Embed(title="Guilds Joined", colour=self.color)
 		for guild in inGuilds:
 			count = count + 1
 			embed.add_field(name=count, value=f'`{guild}`', inline = False)
@@ -31,45 +29,38 @@ class Admin(commands.Cog):
 	@commands.command(name="load", aliases=['l'])
 	@commands.check(botAdminCheck)
 	async def load_cogs(self, ctx, extension):
-		color = 0x9494FF
 		self.client.load_extension(f'cogs.{extension}')
 		embed = discord.Embed(title='Success!', description=f'{extension} is loaded.',
-							   color=color)
+							   color=self.color)
 		await ctx.send(embed=embed)
 
 	@commands.command(name="unload", aliases=['ul'])
 	@commands.check(botAdminCheck)
 	async def unload_cogs(self, ctx, extension):
-		color = 0x9494FF
+		
 		self.client.unload_extension(f'cogs.{extension}')
 		embed = discord.Embed(title='Success!', description=f'{extension} is unloaded.',
-								color=color)
+								color=self.color)
 		await ctx.send(embed=embed)
 
 	@commands.command(name="reload", aliases=['rl'])
 	@commands.check(botAdminCheck)
 	async def reload_cogs(self, ctx, extension):
-		color = 0x9494FF
+		
 		embed = discord.Embed(title='Success!', description=f'{extension} is reloaded.',
-									color=color)
-		try:
-			self.client.reload_extension(f'cogs.{extension}')
-		except:
-			self.client.load_extension(f'cogs.{extension}')
+									color=self.color)
 		await ctx.send(embed=embed)
 			
 	@commands.command(name="restart", aliases=['rst', 'sync'])
 	@commands.check(botAdminCheck)
 	async def restart(self, ctx):
-		color = 0x9494FF
 		for filename in os.listdir('./cogs'):
 			if filename.endswith('.py'):
 				self.client.unload_extension(f'cogs.{filename[:-3]}')
 				self.client.load_extension(f'cogs.{filename[:-3]}')
-				embed = discord.Embed(title='Success!', description=f'{filename[:-3]} is reloaded.',color=color)
-				await ctx.send(embed=embed)
+		await ctx.send(embed=discord.Embed(title='Success!', description=f'Bot has restarted', color=self.color))
 
-	@tasks.loop(hours = 1)
+	@tasks.loop(hours = 5)
 	async def change_status(self):
 		try:
 			await self.client.change_presence(status=discord.Status.online, activity=discord.Game(f'on {len(self.client.guilds)} servers!'))
