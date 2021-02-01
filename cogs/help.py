@@ -30,7 +30,7 @@ class HelpMenu(menus.Menu):
 		
 		page4 = discord.Embed(title = '__# Visual Tutorial__', color = color )
 		page4.add_field(name= " \nThat's about it!", value = f'Have a slipping fun playing!', inline = False)
-		page4.add_field(name= "You've reached the end! wasn't so hard was it.",value= f'[Join our support server for further support!](https://discord.gg/dkgfBktj)', inline = False)
+		page4.add_field(name= "You've reached the end! wasn't so hard was it.",value= f'[Join our support server for further support!](https://discord.gg/UmnzdPgn6g)', inline = False)
 		page4.set_thumbnail(url='https://i.gyazo.com/520cb9b88550dae05d4a340f33eec10c.png')
 		self.pages = [page1, page2, page3, page4]
 		self.count = 0
@@ -70,9 +70,8 @@ class Help(commands.Cog):
 		embed.add_field(name= '\nVisual tutorial:', value = f'`{prefixes[str(ctx.guild.id)]}help tutorial`', inline = True)
 		embed.add_field(name= '\nPrefix Commands:', value = f'`{prefixes[str(ctx.guild.id)]}prefix` (Shows Current Prefix)\n`{prefixes[str(ctx.guild.id)]}prefix change <new_prefix>`(Changes Current Prefix)', inline = False)
 		embed.add_field(name = '\nCustomizable Mode:', value = f'Use `{prefixes[str(ctx.guild.id)]}start custom <rounds> <draw_time> <guess_time> <participants>` (Same command with just more parameters)', inline = False)
-		embed.add_field(name= '\u200b',value= f'[Join our support server for further support!](https://discord.gg/xunWcUs9Rr)', inline = False)
+		embed.add_field(name= '\u200b',value= f'[Join our support server for further support!](https://discord.gg/UmnzdPgn6g)', inline = False)
 		embed.set_thumbnail(url = 'https://cdn.pixabay.com/photo/2013/04/01/21/30/book-99131_960_720.png')
-		embed2 = discord.Embed(title = 'Credits', description = 'Image by OpenIcons from Pixabay')
 		await ctx.send(embed = embed)
 
 	@help.command()
@@ -82,7 +81,7 @@ class Help(commands.Cog):
 		member = ctx.author
 		await message.add_reaction('<:blue_check_mark:768785950947409972>')
 		await ctx.send('> Check your dms!')
-		await member.send("> Here's the link to the support server!\nhttps://discord.gg/xunWcUs9Rr")
+		await member.send("> Here's the link to the support server!\nhttps://discord.gg/UmnzdPgn6g")
 
 	@help.command()
 	@commands.guild_only()
@@ -95,7 +94,8 @@ class Help(commands.Cog):
 		embed = discord.Embed(title = '__# In-depth Guide__ (normal mode)', description ="\n**=** When a lobby is initiated**(start_game command used)**, every participant is required to **prove** their **activity**. This, as of the latest update, is recoginized as replying `ready`. If any of the participants **fail** to prove activity within `30` seconds, the game will consequently fail to start. \n\n **=** After **every** participant have proven their activity, the game will begin after 5 seconds. Chat will be **disabled** until the first drawing is submitted. \n\n **=** A member is then chosen to submit a drawing of a random theme. You can draw the theme on literally anything, you candraw it on a piece of paper, take a picture and DM the bot, you can draw the picture on MS paint and send the bot, literally anything!. If they **fail** to submit the picture within a time frame of `60 seconds`, they will recieve a deduction and the game will continue onto another person in queue. \n\n **=** If however the member **successfully** submitted the drawing, the other participants will have a timeframe of `70 seconds` to guess.\n\n**=** The first person to correctly answer will recieve a few points.\n\n**=** This process is repeated through every member and every rounds.", color = color)
 		embed.add_field(name= '\nVisual tutorial:', value = f'`{prefixes[str(ctx.guild.id)]}help tutorial`', inline = True)
 		embed.add_field(name= '\n__# Guide for Customs__', value = f'Every game functionality will stay the same except several options such as the guessing time, drawing time and themes(coming soon).', inline = False)
-		embed.add_field(name= '\u200b',value= f'[Join our support server for further support!](https://discord.gg/xunWcUs9Rr)', inline = False)
+		embed.add_field(name= '\u200b',value= f'[Join our support server for further support!](https://discord.gg/UmnzdPgn6g)', inline = False)
+		embed.add_field(name = '\u200b\n__# Credits__', value = 'Image by OpenIcons from Pixabay\nProfile photo by [Steve Johnson](https://unsplash.com/@steve_j?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText) on Unsplash')
 		embed.set_thumbnail(url = 'https://cdn.pixabay.com/photo/2013/04/01/21/30/book-99131_960_720.png')
 		await channel.send(embed=embed)
 
