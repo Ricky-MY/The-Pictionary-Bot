@@ -6,7 +6,7 @@
 * 3. [Installation](#installation)
 
 ### General Info
-This extremely simplified repository contains all files required to maintain the Pictionary mini-game bot for discord authored by Ricky. This is a recreation of the worlds renowned mini-game we all love(pictionary) into discord. A game instance can be started on a server basis. Custom prefixes has also been implemented.
+This extremely simplified repository contains all files required to maintain the Pictionary mini-game bot for discord authored using the discord.py library. This is a recreation of the worlds renowned mini-game we all love(pictionary) into discord. A game instance can be started on a server basis. Custom prefixes has also been implemented.
 
 ### Explanation 
 **=** A pictionary game is started when the lobby-making command is called, every participant is required to **prove** their **activity**. This, as of the latest update, is recoginized as replying `ready`. If any of the participants **fail** to prove activity within `30` seconds, the game will consequently fail to start.
@@ -21,7 +21,7 @@ This extremely simplified repository contains all files required to maintain the
 
 **=** This process is repeated through every member and every rounds.
 
-### Installation
+### How to run this project?
 To run this project, install it locally by following these steps:
 
 * 1. Install the discord.py module
@@ -39,10 +39,11 @@ py -3 -m pip install -U discord.py
 ```
 py -3 -m pip install -U git+https://github.com/Rapptz/discord-ext-menus
 ```
+If you don't have git, make sure to install it before the menus extension.
 
 * 3. Navigate to the THIS_MY_TOKEN_HEHE.txt file
 
 Insert the token of your bot instance into the text file.
 
-* 4. Run the bot instance and enjoy! 
+* 4. There are no more dependencies, run the bot instance and have fun. 
 
