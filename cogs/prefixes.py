@@ -4,6 +4,8 @@ import json
 
 class Prefixes(commands.Cog):
 
+	'''Basic class to handle custom prefixes'''
+
 	def __init__(self, client):
 		self.client = client
 
