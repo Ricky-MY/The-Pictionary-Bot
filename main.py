@@ -5,6 +5,8 @@ import json
 
 intents = discord.Intents.default()
 intents.reactions = True
+intents.members = True
+intents.reactions = True
 
 def get_prefix(client, message):
 	with open('prefixes.json', 'r') as f:
