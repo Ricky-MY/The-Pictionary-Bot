@@ -1,10 +1,11 @@
 import discord
 import json
-import os
-import asyncio
-from discord.ext import commands, tasks, menus
+from discord.ext import commands, menus
 
 class HelpMenu(menus.Menu):
+
+	'''Menu system for the help menu'''
+
 	async def send_initial_message(self, ctx, channel):
 		with open('prefixes.json', 'r') as f:
 			prefixes = json.load(f)
