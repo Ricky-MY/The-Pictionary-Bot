@@ -18,6 +18,8 @@ class ExceptionHandler(commands.Cog):
         self.color = 0xC0C0C0
         self.error_color = discord.Color.dark_red()
 
+    '''Basic discord exception handler'''
+
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         if hasattr(ctx.command, 'on_error'):
@@ -55,11 +57,11 @@ class ExceptionHandler(commands.Cog):
 
             elif cog.qualified_name == 'Pictionary':
                 if isinstance(error, commands.BadArgument):
-                    embed = discord.Embed(title='⚠️ Unable to proceed...', description=f"Incorrect details passed in.", color=self.error_color)
+                    embed = discord.Embed(title='⚠️ Unable to proceed...', description=f"Incorrect details passed in. Make sure to include the rounds and mode.", color=self.error_color)
                     embed.set_footer(text=get_usage(ctx))
                     await ctx.send(embed=embed)
                 elif isinstance(error, commands.MissingRequiredArgument):
-                    embed = discord.Embed(title='⚠️ Unable to proceed...', description=f"`User` and `Reason` are required arguments, make sure to add them.", color=self.error_color)
+                    embed = discord.Embed(title='⚠️ Unable to proceed...', description=f"Mandatory arguments are missing, make sure to add them.", color=self.error_color)
                     embed.set_footer(text=get_usage(ctx))
                     await ctx.send(embed=embed)
                 else:
