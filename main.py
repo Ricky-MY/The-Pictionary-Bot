@@ -36,7 +36,7 @@ async def shutdown(ctx):
 @client.event
 async def on_ready():
 	print("________________________________________________________________________________________________________________________\nPictionary is on standby\n________________________________________________________________________________________________________________________")
-	await client.change_presence(status=discord.Status.online, activity=discord.Game(f'Pictionary : {len(client.guilds)} guilds'))
+	await client.change_presence(status=discord.Status.online, activity=discord.Game(f'~help | {len(client.guilds)} guilds'))
 
 for filename in os.listdir('./cogs'):
 	if filename.endswith('.py'):
