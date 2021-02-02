@@ -46,7 +46,7 @@ class Admin(commands.Cog):
 	@commands.command(name="reload", aliases=['rl'])
 	@commands.check(botAdminCheck)
 	async def reload_cogs(self, ctx, extension):
-		
+		self.client.reload_extension(f'cogs.{extension}')
 		embed = discord.Embed(title='Success!', description=f'{extension} is reloaded.',
 									color=self.color)
 		await ctx.send(embed=embed)
