@@ -2,13 +2,47 @@
 
 ## Table of Contents
 * 1. [General Info](#general-info)
-* 2. [Bot Explanation](#explanation)
-* 3. [Installation](#installation)
+* 2. [Trace Tables](#trace-tables)
+* 3. [Bot Explanation](#explanation)
+* 4. [Installation](#installation)
 
 ### General Info
 This extremely simplified repository contains all files required to maintain the Pictionary mini-game bot for discord authored using the discord.py library. This is a recreation of the worlds renowned mini-game we all love(pictionary) into discord. A game instance can be started on a server basis. Custom prefixes has also been implemented.
 
-### Explanation 
+### Trace Tables
+~~~
+          +--------------+           +-------------+
+ start -> |              |           |    Rapid    |
+        | |   Lobbying   |---------->|  Ready-up   | >----------+            
+        + |              |           |   Session   |            | - completion
+          +--------------+           +-------------+            |
+                                                                |
+                                +------------------+            |
+                                |    loop thru     |            |
+                  end  <------< |  all members w/  | <----------+
+                                | respect to rounds|
+                                +------------------+
+~~~
+Rapid Ready-up session
+~~~
+                +-------------+           +-----------------+
+ entry point -> |    Rapid    |---------->|                 | 
+                |  ready-up   |           |  create         |
+                |   Session   |<----------|  Instance list  |
+                +-------------+           +-----------------+ 
+                       |                            ^
+                       |                            |
+                       V                            | - validation
+                +------------------+                |
+                |    raw           | ---------------+
+                |  reaction event  | 
+                +------------------+
+                        ^
+                        |
+                        | - Any types of event that takes in raw reactions
+                        +---------------------------------------
+~~~
+### Wordy Explanation 
 **=** A pictionary game is started when the lobby-making command is called, every participant is required to **prove** their **activity**. This, as of the latest update, is recoginized as replying `ready`. If any of the participants **fail** to prove activity within `30` seconds, the game will consequently fail to start.
 
 **=** After **every** participant have proven their activity, the game will begin after 5 seconds. Chat will be **disabled** until the first drawing is submitted.
