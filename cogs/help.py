@@ -12,20 +12,20 @@ class HelpMenu(menus.Menu):
 		f.close()
 		color = 0x9494FF
 		page1= discord.Embed(title = '__# Visual Tutorial__', color = color )
-		page1.add_field(name= '\nStep 1:', value = f'Initiate a lobby using the command \n`{prefixes[str(ctx.guild.id)]}start_game <rounds> <participants>`\nMake sure to reply with ready when your name is called for activity! :P', inline = False)
-		page1.set_image(url='https://i.gyazo.com/b2720f6103f25cd59dbcc8153dd59d7e.png')
+		page1.add_field(name= '\nStep 1:', value = f'Initiate a lobby using the command \n`{prefixes[str(ctx.guild.id)]}start <mode> <rounds> <participants>`\nAll participants have to react to the message with the emoji given to start the game!', inline = False)
+		page1.set_image(url='https://i.gyazo.com/f641c27eac788ebb888455ba58826a33.png')
 		page1.set_thumbnail(url='https://i.gyazo.com/520cb9b88550dae05d4a340f33eec10c.png')
 		page1.set_footer(text = 'Use the buttons below to browse through the guide')
 
 		page2= discord.Embed(title = '__# Visual Tutorial__', color = color )
-		page2.add_field(name= '\nStep 2:', value = f'If its your turn to draw, draw the theme given to you with whatever you want to draw with! MS Paint is being used in this picture', inline = False)
-		page2.set_image(url='https://i.gyazo.com/bc5544cb7f6053e7fb42ea1b0a906191.png')
+		page2.add_field(name= '\nStep 2:', value = f'If its your turn to draw, the bot will DM you the details, just draw and submit by replying to the dm!', inline = False)
+		page2.set_image(url='https://i.gyazo.com/e4be08116bdd0fedab95c70f200f5dee.png')
 		page2.set_thumbnail(url='https://i.gyazo.com/520cb9b88550dae05d4a340f33eec10c.png')
 		page2.set_footer(text = 'Use the buttons below to browse through the guide')
 
 		page3=discord.Embed(title = '__# Visual Tutorial__', color = color )
 		page3.add_field(name= '\nStep 3:', value = f'Is it not your turn to draw?!, son, its still your turn to guess, wake yourself up!', inline = False)
-		page3.set_image(url='https://i.gyazo.com/3e863c8d18c2f5b315a33c0477e30d37.png')
+		page3.set_image(url='https://i.gyazo.com/bd8c8a8b42e6da796317a87077bced4a.png')
 		page3.set_thumbnail(url='https://i.gyazo.com/520cb9b88550dae05d4a340f33eec10c.png')
 		page3.set_footer(text = 'Use the buttons below to browse through the guide')
 		
