@@ -51,6 +51,7 @@ class Pictionary(commands.Cog):
                     return scores
                 await asyncio.sleep(1)
         await message.edit(embed=discord.Embed(title='__**# Lobby**__', description = f'<@{[key for key in self.to_ready_up[message.id].keys() if self.to_ready_up[message.id][key] == False][0]}> is inactive - Lobby failed to start.', color = discord.Color.dark_red()))
+        self.channels.pop(ctx.guild.id)
         raise asyncio.TimeoutError
 
     '''This is a function to generate a string of blanks and words used to hint and 
