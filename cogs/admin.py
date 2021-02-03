@@ -58,7 +58,7 @@ class Admin(commands.Cog):
 		with open('cogs/subscriptions.json', 'w') as f:
 			json.dump(people_subscribed, f)
 
-	'''Utility commands to provide administrator access on the bot'''
+	'''Utility commands to provide administrator access on the bot plus a few other useful commands.'''
 
 	# Guilds Checker
 	@commands.command(name="guilds")
