@@ -103,7 +103,7 @@ class Pictionary(commands.Cog):
         return members
 
     '''The event below works hand in hand with rapid_ready_up to form a await_for-like process
-    that waits for emojis to be reacted without a halt within the command process.'''
+    that waits for emojis to be reacted without a halt within the command process. Working smoother.'''
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
