@@ -1,7 +1,7 @@
 import discord
 import os
 import json
-from discord.ext import commands, tasks
+from discord.ext import commands
 
 class Admin(commands.Cog):
 	
@@ -14,7 +14,6 @@ class Admin(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 		self.color = 0x9494FF
-		self.change_status.start()
 
 	'''This is a custom ID check designed to disapprove any 
 	alien acceses'''
@@ -70,6 +69,7 @@ class Admin(commands.Cog):
 		text = '\n'.join(guilds)
 		embed = discord.Embed(title="Guilds Joined", description = f"{text}", colour=self.color)
 		embed.set_footer(text=f'Total of {len(guilds)} guild(s) joined')
+		await self.client.change_presence(status=discord.Status.online, activity=discord.Game(f'~help | {len(self.client.guilds)} guilds'))
 		await ctx.send(embed=embed)
 
 	# Load Unload and Reload command
@@ -110,11 +110,16 @@ class Admin(commands.Cog):
 				self.client.load_extension(f'cogs.{filename[:-3]}')
 		await ctx.send(embed=discord.Embed(title='Success!', description=f'Bot has restarted', color=self.color))
 
+	@commands.command(name='alter status', aliases = ['as', 'changeStatus'])
+	@commands.check(botAdminCheck)
+	async def alter_status(self, ctx, *, status):
+		await self.client.change_presence(status=discord.Status.online, activity=discord.Game(f'{status}'))
+		await ctx.send(f"Status successfully changed into |{status}|")
+
 	'''This is purely preferential, this piece of code or loop is used 
 	to update the bot status on how many servers it is currently invited into.'''
-	
-	@tasks.loop(hours = 2)
-	async def change_status(self):
+	@commands.Cog.listener()
+	async def on_guild_join(self, guild):
 		try:
 			await self.client.change_presence(status=discord.Status.online, activity=discord.Game(f'~help | {len(self.client.guilds)} guilds'))
 		except:
