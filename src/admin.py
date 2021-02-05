@@ -120,7 +120,7 @@ class Admin(commands.Cog):
 				self.bot.load_extension(f'{self.main_directory}.{filename[:-3]}')
 		await ctx.send(embed=discord.Embed(title='Success!', description=f'Bot has restarted', color=self.color))
 
-	@commands.command(name='alter status', aliases = ['as', 'changeStatus'])
+	@commands.command(name='alter status', aliases = ['as', 'changeStatus', 'chs', 'changestatus', 'change_status'])
 	@commands.check(botAdminCheck)
 	async def alter_status(self, ctx, *, status):
 		await self.bot.change_presence(status=discord.Status.online, activity=discord.Game(f'{status}'))
