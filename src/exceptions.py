@@ -64,6 +64,13 @@ class ExceptionHandler(commands.Cog):
                     embed = discord.Embed(title='⚠️ Unable to proceed...', description=f"Mandatory arguments are missing, make sure to add them.", color=self.error_color)
                     embed.set_footer(text=get_usage(ctx))
                     await ctx.send(embed=embed)
+                elif isinstance(error, commands.BotMissingPermissions):
+                    embed = discord.Embed(title='⚠️ Permission needed!', description=f"Due to the latest update on the new multi-answering system. The bot now requires the `manage_messages` permission. Find out more [here](https://github.com/Ricky-MY/The-Pictionary-Bot/blob/main/src/game_files/pictionary.py).", color=self.error_color )
+                    embed.add_field(name="Why?", value="The new rewarding system allows multiple people to score points according to how fast they answer. The bot is required to delete valid answers so that when one person gets the correct theme. It remains unexposed.")
+                    embed.add_field(name="How?", value=f"• Create a new role named `Pictionary`\n• Give the role access to the `manage_messages` permission\n• Give {self.bot.user.mention} the role!",inline= True)
+                    embed.set_image(url = 'https://i.gyazo.com/98f79a36e4145705917434c6942f7a99.png')
+                    embed.set_footer(text=f'{ctx.prefix}updates | to find out about latest updates')
+                    await ctx.send(embed=embed)
                 else:
                     await raise_norm(ctx, error)
             else:
