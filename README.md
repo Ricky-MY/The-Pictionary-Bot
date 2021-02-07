@@ -11,36 +11,26 @@ This extremely simplified repository contains all files required to maintain the
 
 ### Trace Tables
 ~~~
-          +--------------+           +-------------+
- start -> |              |           |    Rapid    |
-        | |   Lobbying   |---------->|  Ready-up   | >----------+            
-        + |              |           |   Session   |            | - completion
-          +--------------+           +-------------+            |
-                                                                |
-                                +------------------+            |
-                                |    loop thru     |            |
-                  end  <------< |  all members w/  | <----------+
-                                | respect to rounds|
-                                +------------------+
-~~~
-Rapid Ready-up session
-~~~
-                +-------------+           +-----------------+
- entry point -> |    Rapid    |---------->|                 | 
-                |  ready-up   |           |  create         |
-                |   Session   |<----------|  Instance list  |
-                +-------------+           +-----------------+ 
-                       |                            ^
-                       |                            |
-                       V                            | - validation
-                +------------------+                |
-                |    raw           | ---------------+
-                |  reaction event  | 
-                +------------------+
-                        ^
-                        |
-                        | - Any types of event that takes in raw reactions
-                        +---------------------------------------
+          +--------------+           +-------------+           +-----------------+    +-------------------------------+
+ start -> |              |---------->|    Create   |---------->|  Update         | <--|  - on_raw_reaction + a checker|
+          |   Lobbying   |           |  Attendance |           |  attendance list|    +-------------------------------+
+  end  <- |              |<----------|   List      |<----------|  on user input  |                                  
+          +--------------+           +-------------+  takedown +-----------------+                                  
+                                                                        |
+                                                                        | - all users responded
+                                                                        V
+                                                               +--------------+
+                                                       +------>|      Get     | 
+                                                       |       |  Drawing     |
+                                                       |       +--------------+
+                                                       |              |
+                                                       |              |
+                                                       |              V
+                                                       |        +-------------+    +------------------+
+                                                       |        | Create or   |--->|    on_message to |     
+                                                       +--------| update      |<---| recieve answers  |
+                                                                | check list  |    +------------------+  
+                                                                +-------------+ 
 ~~~
 ### Wordy Explanation 
 **=** A pictionary game is started when the lobby-making command is called, every participant is required to **prove** their **activity**. This, as of the latest update, is recoginized as replying `ready`. If any of the participants **fail** to prove activity within `30` seconds, the game will consequently fail to start.
