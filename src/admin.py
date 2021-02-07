@@ -16,9 +16,6 @@ class Admin(commands.Cog):
 		self.color = 0x87ceeb
 		self.main_directory = 'src'
 
-	'''This is a custom ID check designed to disapprove any 
-	alien acceses'''
-
 	def botAdminCheck(ctx):
 		return ctx.message.author.id == 368671236370464769 # change this number to your ID
 
