@@ -22,17 +22,23 @@ class Pictionary(commands.Cog):
         self.takedown_emoji = '<:takedown:806794390538027009>'
 
     ''' ======= Pictionary =========
-    This is the main cog that every game loop will be in.
+    This is the main cog that the game loop will be written in.
     
-    Initiator - 'start'
-        - normal 
-        - custom
+    Main Commands - 'start'
+        Parameters:
+            - normal 
+            - custom
+                - rounds
+                    - members
     
-    A member checkup is done before bot enters the game loop.'''
+    start <normal/custom> <rounds> <members>
+    '''
 
-    '''This async function loops through self.to_ready_up which contains lobbies that have to be dealt with.
-        It checks whether if the current server that the function is invoked on has all members responded and commited
-        to the lobby.'''
+    '''A lobby system is used before a game instance; that is invoked by
+    the rapid-ready-up function. The function cycles through a request process
+    for 50 seconds, checking whether if all players have responded and commited
+    to the lobby. A on_raw_reaction_add event is used as a reciever that completes a 
+    series of checklists.'''
 
     async def rapid_ready_up(self, ctx, message, members, STARTING_SCORE, guess_time, draw_time):
         self.to_ready_up[message.id] = {}
@@ -65,8 +71,9 @@ class Pictionary(commands.Cog):
         self.channels.pop(ctx.guild.id)
         raise asyncio.TimeoutError
 
-    '''This is a function to generate a string of blanks and words used to hint and 
-    process through the pictionary guessing system.'''
+    '''We use the get_word function to forumulate an omitted word. This is done by
+    replacing all the characters from the theme with underscores. Although there is 
+    a minimal chance that a character stays unomitted.'''
 
     async def get_word(self, themes):
         theme = random.choice(themes)
@@ -85,8 +92,10 @@ class Pictionary(commands.Cog):
         blank = ''.join(blank_list)
         return blank, theme
 
-    '''The function below takes in scores and members, sorts them accordingly to their scores
-    and arranges a scoreboard.'''
+    '''We use the build_score function that takes in scores and members to
+    build the final embed that contains the position and scores of every 
+    player. This is done by sorting them accordingly to their scores from highest
+    to lowest and pairing them up with positions by index.'''
 
     async def build_score(self, channel, members):
         scores = self.scores[channel.id]
@@ -109,8 +118,8 @@ class Pictionary(commands.Cog):
         self.scores.pop(channel.id)
         return embed
 
-    '''To add the author into the basic game construct if it is not included. 
-    It also removes duplicate member argument.'''
+    '''When the start command is invoked, the bot filters through the member list
+    given. It ensures that there are no repeating players and that the bot is not included.'''
 
     async def member_validation(self, members, author, bot):
         members = list(set(members))
@@ -120,7 +129,10 @@ class Pictionary(commands.Cog):
             members.remove(bot)
         return members
 
-    '''To request a drawing from a player through dms.'''
+    '''When a lobby begins, the game instance begins looping through all members, requesting drawings.
+    We get the drawing from a target member by sending them a Dm and `wait_for` a response that has
+    an attachment. If a message that contains an attachment is sent, it will get redirected to the 
+    target channel.'''
 
     async def get_drawing_and_redirect(self, theme, blank, member, channel, waiting_time):
         await channel.send(embed = discord.Embed(title="**Drawing**", description = f"> Its {member.mention}'s turn. You can use any drawing apps to draw the theme. All you need to do is reply to the bot's DMs with the picture!", color = self.color))
@@ -146,6 +158,12 @@ class Pictionary(commands.Cog):
                 message = await channel.send(embed=embed)
                 return message
 
+    '''After a drawing has been submitted. We use a on_message event and the get_answers_from_players function
+    that work collaboratively to get the correct answer from every member and reward them accordingly. This is done by
+    looping through a check list for the answer_time given. When the check list is completely satisfied, the loop ends.
+    The on_message event handles which member had answered correctly and how. This data is stored in a variable that gets
+    checked through the loop.'''
+
     async def get_answers_from_players(self, message, channel, theme, blank, members, artist, answer_time):
         data = [theme, [member for member in members if member!= artist], len(members)]
         self.to_complete_answers[channel.id] = data
@@ -168,7 +186,6 @@ class Pictionary(commands.Cog):
                 embed = message.embeds[0]
                 embed.description = f'Start pushing in THEM guesses, just say it out loud, no fancy commands needed!\n Word : `{blank}`'
                 await message.edit(embed=embed)
-
         if len(z:= data[1]) > 0:
             unanswered = [f'{i.mention}' for i in data[1]]
             text = ', '.join(unanswered)
@@ -179,8 +196,6 @@ class Pictionary(commands.Cog):
         except KeyError:
             pass
     
-    '''The event below will handle answers from players and score them accordingly'''
-
     @commands.Cog.listener()
     async def on_message(self, message):
         author = message.author
@@ -196,7 +211,7 @@ class Pictionary(commands.Cog):
                 self.to_complete_answers[channel.id][2] -= 1
                 self.to_complete_answers[channel.id][1].remove(author)
 
-    '''The event below works hand in hand with rapid_ready_up to form a await_for-like process
+    '''The event below, as mentioned, works hand in hand with rapid_ready_up to form a await_for like process
     that waits for emojis to be reacted without a halt within the command process.
     Making it work like a well oiled machine.'''
 
