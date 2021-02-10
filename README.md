@@ -70,7 +70,7 @@ If you don't have git, make sure to install it before the menus extension.
 
 * 3. Setup dotenv for token feeding
 
-a.Install python-dotenv
+a. Install python-dotenv
 macOS:
 ```
 python3 -m pip install python-dotenv
