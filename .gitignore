@@ -1,5 +1,5 @@
 *.txt
 *.pyc
 *.json
-src/marketing.py
-prefixes.json
+bot/utilities/marketing.py
+.env
