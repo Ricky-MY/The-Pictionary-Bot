@@ -3,8 +3,8 @@
 ## Table of Contents
 * 1. [General Info](#general-info)
 * 2. [Trace Tables](#trace-tables)
-* 3. [Bot Explanation](#explanation)
-* 4. [Installation](#installation)
+* 3. [Bot Explanation](#wordy-explanation)
+* 4. [Installation](#how-can-i-run-this-project?)
 
 ### General Info
 This GitHub repository contains all files required to maintain the Pictionary mini-game bot for discord authored using the discord.py library. This is a recreation of the worlds renowned mini-game we all love, that is pictionary, into discord. A game instance can be started on a channel basis. Custom prefixes has also been implemented.
