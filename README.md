@@ -14,7 +14,7 @@ Started: 1/10/2020
 ### Trace Tables
 ~~~
           +--------------+           +-------------+           +-----------------+    +-------------------------------+
- start -> |              |---------->|    Create   |---------->|  Update         | <--|  - on_raw_reaction + a checker|
+ start -> |              |---------->|    Create   |---------->|  Update         | <--| - on_raw_reaction + a checker |
           |   Lobbying   |           |  Attendance |           |  attendance list|    +-------------------------------+
   end  <- |              |<----------|   List      |<----------|  on user input  |                                  
           +--------------+           +-------------+  takedown +-----------------+                                  
@@ -22,16 +22,16 @@ Started: 1/10/2020
                                                                         | - all users responded
                                                                         V
                                                                +--------------+
-                                                       +------>|      Get     | 
+                                                       +------>|    Get       | 
                                                        |       |  Drawing     |
                                                        |       +--------------+
-                                                       |              |
-                                                       |              |
-                                                       |              V
-                                                       |        +-------------+    +------------------+
-                                                       |        | Create or   |--->|    on_message to |     
-                                                       +--------| update      |<---| recieve answers  |
-                                                                | check list  |    +------------------+  
+                        +--------------+               |              |
+              end  <----|  build and   |<--------------+              |
+                        |output scores |      ^        |              V
+                        +--------------+      |        |        +-------------+    +------------------+
+                                              |        |        |  Create or  |--->|  on_message to   |     
+                            after all members |        +--------|  update     |<---| recieve answers  |
+                       .----------------------+                 | check list  |    +------------------+  
                                                                 +-------------+ 
 ~~~
 ### Wordy Explanation 
