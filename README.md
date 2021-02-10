@@ -7,7 +7,9 @@
 * 4. [Installation](#installation)
 
 ### General Info
-This extremely simplified repository contains all files required to maintain the Pictionary mini-game bot for discord authored using the discord.py library. This is a recreation of the worlds renowned mini-game we all love(pictionary) into discord. A game instance can be started on a server basis. Custom prefixes has also been implemented.
+This GitHub repository contains all files required to maintain the Pictionary mini-game bot for discord authored using the discord.py library. This is a recreation of the worlds renowned mini-game we all love, that is pictionary, into discord. A game instance can be started on a channel basis. Custom prefixes has also been implemented.
+
+Started: 1/10/2020
 
 ### Trace Tables
 ~~~
@@ -33,24 +35,25 @@ This extremely simplified repository contains all files required to maintain the
                                                                 +-------------+ 
 ~~~
 ### Wordy Explanation 
-**=** A pictionary game is started when the lobby-making command is called, every participant is required to **prove** their **activity**. This, as of the latest update, is recoginized as replying `ready`. If any of the participants **fail** to prove activity within `30` seconds, the game will consequently fail to start.
+**1.** When a lobby is initiated**(start_game command used)**, every participant is required to **prove** their **activity**. This, as of the latest update, is recoginized as reacting to the lobby message with 🖌️. If any of the participants **fail** to prove activity within `30` seconds, the game will consequently fail to start. Players can also vote for take-down using the emoji TAKEDOWN.
 
-**=** After **every** participant have proven their activity, the game will begin after 5 seconds. Chat will be **disabled** until the first drawing is submitted.
+**2.** After **every** participant have proven their activity, the game will begin after 5 seconds. Chat will be **disabled** until the first drawing is submitted.
 
-**=** A member is then chosen to submit a drawing of a random theme. You can draw the theme on literally anything, you candraw it on a piece of paper, take a picture and DM the bot, you can draw the picture on MS paint and send the bot, literally anything!. If they **fail** to submit the picture within a time frame of `60 seconds`, they will recieve a deduction and the game will continue onto another person in queue. 
+**3.** A member is then chosen to submit a drawing of a random theme. You can draw the theme on literally anything, you candraw it on a piece of paper, take a picture and DM the bot, you can draw the picture on MS paint and send the bot, literally anything!. If they **fail** to submit the picture within a time frame of `60 seconds`, they will recieve a deduction and the game will continue onto another person in queue.
 
-**=** If however the member **successfully** submitted the drawing, the other participants will have a timeframe of `70 seconds` to guess.
+**4.** If however the member **successfully** submitted the drawing, the other participants will have a timeframe of `70 seconds` to guess.
 
-**=** The first person to correctly answer will recieve a few points.
+**5.** All players who are able to answer correctly gets the points, the faster the more points.
 
-**=** This process is repeated through every member and every rounds.
+**6.** This process is repeated through every member and every rounds.
 
-### How to run this project?
+### How can I run this project?
 To run this project, install it locally by following these steps:
 
-* 1. Install the discord.py module
+* 1. Install the discord.py module (USE PYTHON 3.8 OR ABOVE)
 
 You can get the library directly from PyPI:
+On macOS:
 ```
 python3 -m pip install -U discord.py
 ```
@@ -65,9 +68,22 @@ py -3 -m pip install -U git+https://github.com/Rapptz/discord-ext-menus
 ```
 If you don't have git, make sure to install it before the menus extension.
 
-* 3. Navigate to the THIS_MY_TOKEN_HEHE.txt file
+* 3. Create a .env file in the root directory
+a. Install python-dotenv for token feeding
+macOS:
+```
+python3 -m pip install python-dotenv
+```
+Windows:
+```
+py -3 -m pip install python-dotenv
+```
+b. Create a `.env` file in the root directory
+This must be in the same directory as `__main__.py`
+d. Insert in your token
+~~~
+TOKEN="YOUR_TOKEN"
+~~~
 
-Insert the token of your bot instance into the text file.
-
-* 4. There are no more dependencies, run the bot instance and have fun. 
+**That is all you need to run this project. If you want to try out a pre-hosted bot, please navigate to this website https://top.gg/bot/768442873561481216** 
 
