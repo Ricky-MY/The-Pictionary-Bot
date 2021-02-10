@@ -68,8 +68,8 @@ py -3 -m pip install -U git+https://github.com/Rapptz/discord-ext-menus
 ```
 If you don't have git, make sure to install it before the menus extension.
 
-* 3. Create a .env file in the root directory
-a. Install python-dotenv for token feeding
+* 3. Setup dotenv for token feeding
+Install python-dotenv
 macOS:
 ```
 python3 -m pip install python-dotenv
@@ -80,6 +80,7 @@ py -3 -m pip install python-dotenv
 ```
 b. Create a `.env` file in the root directory
 This must be in the same directory as `__main__.py`
+
 d. Insert in your token
 ~~~
 TOKEN="YOUR_TOKEN"
