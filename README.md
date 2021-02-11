@@ -1,5 +1,7 @@
 # Pictionary
 
+[![HitCount](http://hits.dwyl.com/Ricky-MY/The-Pictionary-Bot.svg)](http://hits.dwyl.com/Ricky-MY/The-Pictionary-Bot)
+
 ## Table of Contents
 * 1. [General Info](#general-info)
 * 2. [Trace Tables](#trace-tables)
