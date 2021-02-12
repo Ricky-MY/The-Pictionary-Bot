@@ -50,7 +50,7 @@ Started: 1/10/2020
 **6.** This process is repeated through every member and every rounds.
 
 ### How can I run this project?
-Create a virtualenv and install all dependencies inside `requirement.txt`.
+Create a virtualenv and install all dependencies inside `requirements.txt`.
 
 > If you are unfamiliar with virtualenv, follow the steps below.
 
