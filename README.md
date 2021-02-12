@@ -50,7 +50,11 @@ Started: 1/10/2020
 **6.** This process is repeated through every member and every rounds.
 
 ### How can I run this project?
-To run this project, install it locally by following these steps:
+Create a virtualenv and install all dependencies inside `requirement.txt`.
+
+> If you are unfamiliar with virtualenv, follow the steps below.
+
+To run this project manually, follow these steps:
 
 * 1. Install the discord.py module (USE PYTHON 3.8 OR ABOVE)
 
