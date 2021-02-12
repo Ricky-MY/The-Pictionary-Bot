@@ -14,7 +14,7 @@ class HelpMenu(menus.Menu):
         color = 0x87ceeb
         page1 = discord.Embed(title='__# Visual Tutorial__', color=color)
         page1.add_field(
-            name='\nStep 1:', value=f'Initiate a lobby using the command \n`{prefixes[str(ctx.guild.id)]}start <mode> <rounds> <participants>`\nAll participants have to react to the message with the emoji given to start the game!', inline=False)
+            name='\nStep 1:', value=f'Initiate a lobby using the command \n`{prefix}start <mode> <rounds> <participants>`\nAll participants have to react to the message with the emoji given to start the game!', inline=False)
         page1.set_image(
             url='https://i.gyazo.com/f641c27eac788ebb888455ba58826a33.png')
         page1.set_thumbnail(
@@ -75,62 +75,67 @@ class Help(commands.Cog):
         self.bot = bot
         self.color = 0x87ceeb
 
-    @commands.command(name= "updates", aliases = ["changelog", "ch", "up"])
-    @commands.guild_only()
-    async def updates(self, ctx):
+    def go_get_prefix(self, ctx):
         with open(prefixes_directory, 'r') as f:
-            prefixes = json.load(f)
-        embed = discord.Embed(title="__# Changelog__", description=f'Command : `{prefixes[str(ctx.guild.id)]}start normal <rounds> <participants>`\n\n__**Update Pushed : 05/02/2021**__', color=self.color)
+                prefixes = json.load(f)
+        try:
+            prefixes[str(ctx.guild.id)]
+        except AttributeError:
+            return '~'
+        else:
+            return prefixes[str(ctx.guild.id)]
+
+    @commands.command(name= "updates", aliases = ["changelog", "ch", "up"])
+    async def updates(self, ctx):
+        prefix = self.go_get_prefix(ctx)
+        embed = discord.Embed(title="__# Changelog__", description=f'Command : `{prefix}start normal <rounds> <participants>`\n\n__**Update Pushed : 05/02/2021**__', color=self.color)
         embed.add_field(name='\nNew Hinting System:',
                         value=f'If players are unable to answer within the first __7 seconds__, more blanks will be revealed in the interval of __6 seconds__.', inline=False)
         embed.add_field(name='\nNew Rewarding System:',
                         value=f'The new system allows everyone who can answer the picture to be rewarded. The __faster__ a person answers the more points they get.', inline=False)
         embed.add_field(name='\nColor scheme change and three new commands',
-                        value=f'All embed colors have been changed into __0x87ceeb__.\n•{prefixes[str(ctx.guild.id)]}updates\n•{prefixes[str(ctx.guild.id)]}feedback <feedback>\n•{prefixes[str(ctx.guild.id)]}help drawing', inline=False)
-        embed.add_field(name='\nPatches:',
-                        value=f'Spamming message in ready. | Self destructive messages', inline=False)
+                        value=f'All embed colors have been changed into __0x87ceeb__.\n•{prefix}updates\n•{prefix}feedback <feedback>\n•{prefix}help drawing', inline=False)
+        embed.add_field(name='\nBetter generated themes:',
+                        value=f'Pulling from local dictionaries for themes', inline=False)
         embed.add_field(name='\u200b\nPrefix Commands:',
-                        value=f'`{prefixes[str(ctx.guild.id)]}prefix` (Shows Current Prefix)\n`{prefixes[str(ctx.guild.id)]}prefix change <new_prefix>`(Changes Current Prefix)', inline=True)
+                        value=f'`{prefix}prefix` (Shows Current Prefix)\n`{prefix}prefix change <new_prefix>`(Changes Current Prefix)', inline=True)
         embed.add_field(name='\u200b\nMultipurpose Help:',
-                        value=f'Use `{prefixes[str(ctx.guild.id)]}help`', inline=True)
+                        value=f'Use `{prefix}help`', inline=True)
         embed.add_field(
             name='\u200b', value=f'[Find the open-source code here!](https://github.com/Ricky-MY/The-Pictionary-Bot)', inline=False)
         embed.set_thumbnail(
             url='https://cdn.pixabay.com/photo/2013/04/01/21/30/book-99131_960_720.png')
-        embed.timestamp = datetime.datetime(2021, 5, 2)
+        embed.set_footer(text="Version 1.0.0.0")
+        embed.timestamp = datetime.datetime(2021, 14, 2)
         await ctx.send(embed=embed)
 
 
     # Guilds Checker
     @commands.group(name="help", aliases=['manual', 'YOOO', 'info'], invoke_without_command=True)
-    @commands.guild_only()
     async def help(self, ctx):
-        with open(prefixes_directory, 'r') as f:
-            prefixes = json.load(f)
-        embed = discord.Embed(title="__# Information and Manual__", description=f'Command : `{prefixes[str(ctx.guild.id)]}start normal <rounds> <participants>`\n\n**1. A game can consist of 2 to 30 players**\n- All participants must be active when the game is started.\n\n**2. When the game starts each participant in the game will have a chance to draw and guess.**\n- To draw, you should use MS paint or any simple paint application screenshot it and submit it. For more drawing related tips do `{prefixes[str(ctx.guild.id)]} help drawing`. Normally, each person gets 60 seconds to draw and 70 seconds to guess\n\n**3. You get higher points the faster you get the answer.**\n- Note that the scores are built for every game session.', color=self.color)
+        prefix = self.go_get_prefix(ctx)
+        embed = discord.Embed(title="__# Information and Manual__", description=f'Command : `{prefix}start normal <rounds> <participants>`\n\n**1. A game can consist of 2 to 30 players**\n- All participants must be active when the game is started.\n\n**2. When the game starts each participant in the game will have a chance to draw and guess.**\n- To draw, you should use MS paint or any simple paint application screenshot it and submit it. For more drawing related tips do `{prefix} help drawing`. Normally, each person gets 60 seconds to draw and 70 seconds to guess\n\n**3. You get higher points the faster you get the answer.**\n- Note that the scores are built for every game session.', color=self.color)
         embed.add_field(name='\nIn-depth Guide:',
-                        value=f'`{prefixes[str(ctx.guild.id)]}help guide`', inline=True)
+                        value=f'`{prefix}help guide`', inline=True)
         embed.add_field(name='\nVisual tutorial:',
-                        value=f'`{prefixes[str(ctx.guild.id)]}help tutorial`', inline=True)
+                        value=f'`{prefix}help tutorial`', inline=True)
         embed.add_field(name='\nDrawing Guide:',
-                        value=f'`{prefixes[str(ctx.guild.id)]}help drawing`', inline=True)
+                        value=f'`{prefix}help drawing`', inline=True)
         embed.add_field(name='\nLATEST UPDATES:',
-                        value=f'`{prefixes[str(ctx.guild.id)]}updates`', inline=True)
+                        value=f'`{prefix}updates`', inline=True)
         embed.add_field(name='\nSubmit feedback',
-                        value = f'`{prefixes[str(ctx.guild.id)]}feedback <feedback>`', inline=True)
+                        value = f'`{prefix}feedback <feedback>`', inline=True)
         embed.add_field(name='\nPrefix Comamnds:',
-                        value=f'`{prefixes[str(ctx.guild.id)]}prefix` (Current Prefix)\n`{prefixes[str(ctx.guild.id)]}prefix change <new_prefix>`(changes current prefix)', inline=False)
+                        value=f'`{prefix}prefix` (Current Prefix)\n`{prefix}prefix change <new_prefix>`(changes current prefix)', inline=False)
         embed.add_field(name='\nCustomizable Mode:',
-                        value=f'Use `{prefixes[str(ctx.guild.id)]}start custom <rounds> <participants> <draw_time> <guess_time>`', inline=False)
+                        value=f'Use `{prefix}start custom <rounds> <participants> <draw_time> <guess_time>`', inline=False)
         embed.add_field(
             name='\u200b', value=f'Join our support [server](https://discord.gg/UmnzdPgn6g) for more support and check out the open sourced Git-Hub repository [here](https://github.com/Ricky-MY/The-Pictionary-Bot).', inline=False)
-        embed.set_footer(text="Version 1.0.0.0")
         embed.set_thumbnail(
             url='https://cdn.pixabay.com/photo/2013/04/01/21/30/book-99131_960_720.png')
         await ctx.send(embed=embed)
 
     @help.command()
-    @commands.guild_only()
     async def support(self, ctx):
         message = ctx.message
         member = ctx.author
@@ -140,14 +145,13 @@ class Help(commands.Cog):
 
     @help.command()
     async def guide(self, ctx):
-        with open(prefixes_directory, 'r') as f:
-            prefixes = json.load(f)
         channel = ctx.channel
-        embed = discord.Embed(title='__# In-depth Guide__ (normal mode)', description=f"Command : `{prefixes[str(ctx.guild.id)]}start normal <rounds> <participants>`\n\n**1.** When a lobby is initiated**(start_game command used)**, every participant is required to **prove** their **activity**. This, as of the latest update, is recoginized as reacting to the lobby message with 🖌️. If any of the participants **fail** to prove activity within `30` seconds, the game will consequently fail to start. Players can also vote for take-down using the emoji <:takedown:806794390538027009>.\n\n **2.** After **every** participant have proven their activity, the game will begin after 5 seconds. Chat will be **disabled** until the first drawing is submitted. \n\n **3.** A member is then chosen to submit a drawing of a random theme. You can draw the theme on literally anything, you candraw it on a piece of paper, take a picture and DM the bot, you can draw the picture on MS paint and send the bot, literally anything!. If they **fail** to submit the picture within a time frame of `60 seconds`, they will recieve a deduction and the game will continue onto another person in queue. \n\n **4.** If however the member **successfully** submitted the drawing, the other participants will have a timeframe of `70 seconds` to guess.\n\n**5.** All players who are able to answer correctly gets the points, the faster the more points.\n\n**6.** This process is repeated through every member and every rounds.", color=self.color)
+        prefix = self.go_get_prefix(ctx)
+        embed = discord.Embed(title='__# In-depth Guide__ (normal mode)', description=f"Command : `{prefix}start normal <rounds> <participants>`\n\n**1.** When a lobby is initiated**(start_game command used)**, every participant is required to **prove** their **activity**. This, as of the latest update, is recoginized as reacting to the lobby message with 🖌️. If any of the participants **fail** to prove activity within `30` seconds, the game will consequently fail to start. Players can also vote for take-down using the emoji <:takedown:806794390538027009>.\n\n **2.** After **every** participant have proven their activity, the game will begin after 5 seconds. Chat will be **disabled** until the first drawing is submitted. \n\n **3.** A member is then chosen to submit a drawing of a random theme. You can draw the theme on literally anything, you candraw it on a piece of paper, take a picture and DM the bot, you can draw the picture on MS paint and send the bot, literally anything!. If they **fail** to submit the picture within a time frame of `60 seconds`, they will recieve a deduction and the game will continue onto another person in queue. \n\n **4.** If however the member **successfully** submitted the drawing, the other participants will have a timeframe of `70 seconds` to guess.\n\n**5.** All players who are able to answer correctly gets the points, the faster the more points.\n\n**6.** This process is repeated through every member and every rounds.", color=self.color)
         embed.add_field(name='\nVisual tutorial:',
-                        value=f'`{prefixes[str(ctx.guild.id)]}help tutorial`', inline=True)
+                        value=f'`{prefix}help tutorial`', inline=True)
         embed.add_field(name='\nDrawing tips and tricks:',
-                        value=f'`{prefixes[str(ctx.guild.id)]}help drawing`', inline=True)
+                        value=f'`{prefix}help drawing`', inline=True)
         embed.add_field(name='\n__# Guide for Customs__',
                         value=f'Every game functionality will stay the same except several options such as the guessing time, drawing time and themes(coming soon).', inline=False)
         embed.add_field(name='\u200b\n__# Credits__',
@@ -160,10 +164,9 @@ class Help(commands.Cog):
 
     @help.command()
     async def drawing(self, ctx):
-        with open(prefixes_directory, 'r') as f:
-            prefixes = json.load(f)
+        prefix = self.go_get_prefix(ctx)
         channel = ctx.channel
-        embed = discord.Embed(title='__**# Drawing Guide**__', description=f"Command : `{prefixes[str(ctx.guild.id)]}start normal <rounds> <participants>`\n\n**How do you draw and submit?**\nIt is highly recommended that you use really simple drawing programs such as MS paint. Here are the main steps:\n- Draw the theme in the art program\n- Screenshot it\n- Reply to the bot's DM *You can use CTRL+V to paste it directly into discord.*\nThe list below shows how to take screenshots on the 3 most popular OS.", color=self.color)
+        embed = discord.Embed(title='__**# Drawing Guide**__', description=f"Command : `{prefix}start normal <rounds> <participants>`\n\n**How do you draw and submit?**\nIt is highly recommended that you use really simple drawing programs such as MS paint. Here are the main steps:\n- Draw the theme in the art program\n- Screenshot it\n- Reply to the bot's DM *You can use CTRL+V to paste it directly into discord.*\nThe list below shows how to take screenshots on the 3 most popular OS.", color=self.color)
         embed.add_field(name='\nWindows:',
                         value=f'> •`PrntScreen` (RECOMMENDED)\n > •`Alt+PrtScn`\n > •`Win+Shift+S`\n > •`Win+PrtScn`', inline=True)
         embed.add_field(name='\nMacOS:',
@@ -171,9 +174,9 @@ class Help(commands.Cog):
         embed.add_field(name='\nLinux Debian:',
                         value=f'> •`PrntScreen` (RECOMMENDED)\n > •`Alt+PrtScn`', inline=True)
         embed.add_field(name='\nVisual tutorial:',
-                        value=f'`{prefixes[str(ctx.guild.id)]}help tutorial`', inline=True)
+                        value=f'`{prefix}help tutorial`', inline=True)
         embed.add_field(name='\nMultipurpose guide:',
-                        value=f'`{prefixes[str(ctx.guild.id)]}help`', inline=True)
+                        value=f'`{prefix}help`', inline=True)
         embed.add_field(name='\n__# Guide for Customs__',
                         value=f'Every game functionality will stay the same except several options such as the guessing time, drawing time and themes(coming soon).', inline=False)
         embed.add_field(
