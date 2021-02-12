@@ -18,8 +18,7 @@ def get_prefix(bot, message):
             json.dump(prefixes, f, indent=4)
         return commands.when_mentioned_or(prefixes[str(message.guild.id)])(bot, message)
     except AttributeError:
-        pass
-
+        return ['~']
 
 class Prefixes(commands.Cog):
 
