@@ -74,20 +74,37 @@ class Admin(commands.Cog):
 	@commands.command(name="load", aliases=['l'])
 	@commands.check(botAdminCheck)
 	async def load_cog(self, ctx, extension):
-		self.bot.load_extension(f'{self.main_directory}.{extension}')
 		embed = discord.Embed(title='Success!', description=f'{extension} is loaded.',
-							   color=self.color)
-		await ctx.send(embed=embed)
+										color=self.color)
+		for subdir in listdir(f'{self.main_directory}'):
+			try:
+				self.bot.load_extension(f'{self.main_directory}.{subdir}.{extension}')
+			except ExtensionNotLoaded:
+				pass
+			except ExtensionNotFound:
+				pass
+			else:
+				await ctx.send(embed=embed)
+				return
+		raise ExtensionNotFound(extension)
 
 	# Unload command
 	@commands.command(name="unload", aliases=['ul'])
 	@commands.check(botAdminCheck)
 	async def unload_cog(self, ctx, extension):
-		
-		self.bot.unload_extension(f'{self.main_directory}.{extension}')
-		embed = discord.Embed(title='Success!', description=f'{extension} is unloaded.',
-								color=self.color)
-		await ctx.send(embed=embed)
+		embed = discord.Embed(title='Success!', description=f'{extension} is loaded.',
+										color=self.color)
+		for subdir in listdir(f'{self.main_directory}'):
+			try:
+				self.bot.unload_extension(f'{self.main_directory}.{subdir}.{extension}')
+			except ExtensionNotLoaded:
+				pass
+			except ExtensionNotFound:
+				pass
+			else:
+				await ctx.send(embed=embed)
+				return
+		raise ExtensionNotFound(extension)
 
 	# Reload command
 	@commands.command(name="reload", aliases=['rl'])
