@@ -1,6 +1,7 @@
 *.txt
 *.pyc
 *.json
-bot/utilities/marketing.py
 .env
+.vscode
+bot/utilities/marketing.py
 dependencies
