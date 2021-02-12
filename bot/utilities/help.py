@@ -69,7 +69,6 @@ class HelpMenu(menus.Menu):
     async def on_stop(self, payload):
         await self.message.delete()
 
-
 class Help(commands.Cog):
 
     def __init__(self, bot):
