@@ -3,3 +3,4 @@
 *.json
 bot/utilities/marketing.py
 .env
+dependencies
