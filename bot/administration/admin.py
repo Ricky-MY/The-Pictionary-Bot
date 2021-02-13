@@ -1,6 +1,7 @@
 import discord
-from os import listdir
 import json
+
+from os import listdir
 from discord.ext import commands
 from discord.ext.commands.errors import ExtensionNotFound, ExtensionNotLoaded
 
@@ -21,7 +22,7 @@ class Admin(commands.Cog):
 		return ctx.message.author.id == 368671236370464769 # change this number to your ID
 
 	'''Pushing and publishing updates and threads to 
-	guild owners, this part can be mostly ignored'''
+	guild owners, this part should be ignored'''
 
 	@commands.command(name = "restart subslist", aliases=['rstl'])
 	@commands.guild_only()
@@ -142,6 +143,7 @@ class Admin(commands.Cog):
 
 	'''This is purely preferential, this piece of code or loop is used 
 	to update the bot status on how many servers it is currently invited into.'''
+
 	@commands.Cog.listener()
 	async def on_guild_join(self, guild):
 		try:
