@@ -9,9 +9,8 @@ class HelpMenu(menus.Menu):
     '''Menu system for the help menu'''
 
     async def send_initial_message(self, ctx, channel):
-        with open(prefixes_directory, 'r') as f:
-            prefixes = json.load(f)
         color = 0x87ceeb
+        prefix = Help.go_get_prefix(self, ctx=ctx)
         page1 = discord.Embed(title='__# Visual Tutorial__', color=color)
         page1.add_field(
             name='\nStep 1:', value=f'Initiate a lobby using the command \n`{prefix}start <mode> <rounds> <participants>`\nAll participants have to react to the message with the emoji given to start the game!', inline=False)
@@ -95,8 +94,8 @@ class Help(commands.Cog):
                         value=f'The new system allows everyone who can answer the picture to be rewarded. The __faster__ a person answers the more points they get.', inline=False)
         embed.add_field(name='\nColor scheme change and three new commands',
                         value=f'All embed colors have been changed into __0x87ceeb__.\n•{prefix}updates\n•{prefix}feedback <feedback>\n•{prefix}help drawing', inline=False)
-        embed.add_field(name='\nBetter generated themes:',
-                        value=f'Pulling from local dictionaries for themes', inline=False)
+        embed.add_field(name='\nBetter generated themes and DM invokable commands:',
+                        value=f'Now pulling from larger local dictionaries for themes and commands such as help can be invoked in DMs.', inline=False)
         embed.add_field(name='\u200b\nPrefix Commands:',
                         value=f'`{prefix}prefix` (Shows Current Prefix)\n`{prefix}prefix change <new_prefix>`(Changes Current Prefix)', inline=True)
         embed.add_field(name='\u200b\nMultipurpose Help:',
@@ -106,7 +105,7 @@ class Help(commands.Cog):
         embed.set_thumbnail(
             url='https://cdn.pixabay.com/photo/2013/04/01/21/30/book-99131_960_720.png')
         embed.set_footer(text="Version 1.0.0.0")
-        embed.timestamp = datetime.datetime(2021, 14, 2)
+        embed.timestamp = datetime.datetime(2021, 2, 14)
         await ctx.send(embed=embed)
 
 
