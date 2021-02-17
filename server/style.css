@@ -10,6 +10,7 @@ body {
 
 #brushboard {  
   padding: 10px, 10px;
+  display:flex;
   background: rgba(128, 128, 128, 0.719);
 }
 

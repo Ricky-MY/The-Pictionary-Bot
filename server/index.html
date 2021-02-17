@@ -10,7 +10,7 @@
   <body>
     <div class="painter">
       <canvas id = "brushboard"></canvas>
-      <script type="text/javascript" src="canvasFramework.js"></script>
+      <script type="text/javascript" src="canvas.js"></script>
     </div>
     <div class="app" id ="boxer">
       <div class="controls">
@@ -34,8 +34,8 @@
           <input type="color" id="pen-color" value="#000000" />
         </div>
         <div class="actions">
-          <button id="reset-canvas">Clear</button>
-          <button id="submit">Submit</button>
+          <button id="reset-canvas" onclick=doResetCanvas()>Clear</button>
+          <button id="submit" onclick=doShipFile()>Submit</button>
         </div>
       </div>
       <div id="canvas-wrapper"></div>
