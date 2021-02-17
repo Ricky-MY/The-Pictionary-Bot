@@ -90,7 +90,7 @@ class Pictionary(commands.Cog):
     replacing all the characters from the theme with underscores. Although there is 
     a minimal chance that a character stays unomitted.'''
 
-    async def get_word(self):
+    def get_word(self):
         theme = random.choice(self.themes)
         words_of_theme = list(theme)
         blank_list = []
@@ -112,7 +112,7 @@ class Pictionary(commands.Cog):
     player. This is done by sorting them accordingly to their scores from highest
     to lowest and pairing them up with positions by index.'''
 
-    async def build_score(self, channel, members):
+    def build_score(self, channel, members):
         scores = sorted(self.scores[channel.id].items(),
                         key=lambda x: x[1], reverse=True)
         embed = discord.Embed(title='__**# Scoreboard**__', color=self.color)
@@ -127,13 +127,13 @@ class Pictionary(commands.Cog):
     '''When the start command is invoked, the bot filters through the member list
     given. It ensures that there are no repeating players and that the bot is not included.'''
 
-    async def member_validation(self, members, author, bot):
-        members = list(set(members))
+    def member_validation(self, members, author, bot):
+        members = set(members)
         if author not in members:
             members.append(author)
         if self.bot.user in members:
             members.remove(bot)
-        return members
+        return list(members)
 
     '''When a lobby begins, the game instance begins looping through all members, requesting drawings.
     We get the drawing from a target member by sending them a Dm and `wait_for` a response that has
