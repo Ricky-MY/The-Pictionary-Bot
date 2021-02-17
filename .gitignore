@@ -3,5 +3,6 @@
 *.json
 .env
 .vscode
+test
 bot/utilities/marketing.py
 dependencies
