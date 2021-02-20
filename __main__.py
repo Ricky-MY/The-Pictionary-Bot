@@ -1,29 +1,16 @@
-from discord import Intents
-from discord import Status
-from discord import Game
 from discord.ext import commands
+from discord import Intents, Game, Status
 
 from dotenv import load_dotenv
+from os import listdir, getenv
+
 from bot.utilities.prefixes import get_prefix
-from os import listdir
-from os import getenv
+from bot.administration.admin import Admin
 
 intents = Intents.default()
 intents.reactions = True
-intents.members = True
-
 bot = commands.Bot(command_prefix=get_prefix, status=Status.online, activity= Game(f'~help'), intents = intents)
 bot.remove_command('help')
-
-@bot.command(name="shutdown")
-@commands.guild_only()
-async def shutdown(ctx):
-	await ctx.send('Bot has been shut down.')
-	await bot.logout()
-
-@bot.event
-async def on_ready():
-	print("+------------------------+\n|Pictionary is on standby|\n+------------------------+")
 
 parentdir = 'bot'
 for filename in listdir(f'./{parentdir}'):
@@ -32,6 +19,15 @@ for filename in listdir(f'./{parentdir}'):
 			if subdir.endswith('.py') and not subdir.startswith('_') and not subdir.startswith('.'):
 				bot.load_extension(f'{parentdir}.{filename}.{subdir[:-3]}')
 
+@bot.event
+async def on_ready():
+	print("+------------------------+\n|Pictionary is on standby|\n+------------------------+")
+	
+@commands.check(Admin.botAdminCheck)
+@commands.guild_only()
+async def shutdown(ctx):
+	await ctx.send('Bot has been shut down.')
+	await bot.logout()
+
 load_dotenv()
-token = getenv('TOKEN')
-bot.run(token)
+bot.run(getenv('TOKEN'))
