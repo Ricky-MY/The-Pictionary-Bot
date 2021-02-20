@@ -4,5 +4,6 @@
 .env
 .vscode
 test
+server
 bot/utilities/marketing.py
 dependencies
