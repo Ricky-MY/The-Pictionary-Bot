@@ -128,7 +128,7 @@ class Pictionary(commands.Cog):
     given. It ensures that there are no repeating players and that the bot is not included.'''
 
     def member_validation(self, members, author, bot):
-        members = set(members)
+        members = list(set(members))
         if author not in members:
             members.append(author)
         if self.bot.user in members:
@@ -227,12 +227,11 @@ class Pictionary(commands.Cog):
         if payload.channel_id in [self.channels[key] for key in self.channels.keys()]:
             guild = discord.utils.find(
                 lambda g: g.id == payload.guild_id, self.bot.guilds)
-
             channel = guild.get_channel(payload.channel_id)
             message = await channel.fetch_message(payload.message_id)
             if payload.user_id in [i for i in self.to_ready_up[message.id].keys()] and not self.to_ready_up[message.id][payload.user_id]:
                 emoji = str(payload.emoji)
-                member = guild.get_member(payload.user_id)
+                member = await guild.fetch_member(payload.user_id)
                 if emoji == self.ready_up_emoji:
                     self.to_ready_up[message.id][payload.user_id] = True
                     await channel.send(f'{member.display_name} is now ready!')
@@ -262,7 +261,7 @@ class Pictionary(commands.Cog):
             await ctx.send("⚠️ You didn't specify any participants, please try again.")
             return
         elif members is not None:
-            members = await self.member_validation(members, ctx.author, ctx.guild.me)
+            members = self.member_validation(members, ctx.author, ctx.guild.me)
 
         if len(members) < 2:
             await ctx.send("⚠️ You need more than 2 members to start a game.")
@@ -298,7 +297,7 @@ class Pictionary(commands.Cog):
             if i > 0:
                 await channel.send(embed=discord.Embed(title="Game Update", description=f'Round : {i+1}', color=self.color))
             for member in members:
-                blank, theme = await self.get_word()
+                blank, theme = self.get_word()
                 # To request the drawing and redirection of the drawing from the member
                 try:
                     message = await self.get_drawing_and_redirect(theme, blank, member, channel, DRAWING_TIME)
@@ -311,7 +310,7 @@ class Pictionary(commands.Cog):
                     self.scores[channel.id][member.id] -= BASIC_SCORE
                 else:
                     await self.get_answers_from_players(message, channel, theme, blank, members, member, GUESSING_TIME)
-        embed = await self.build_score(channel, members)
+        embed = self.build_score(channel, members)
         await channel.send(embed=embed)
         self.channels.pop(ctx.guild.id)
         print(self.channels)

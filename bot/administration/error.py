@@ -3,9 +3,9 @@ import sys
 
 from discord import Embed
 from discord import Color
-from discord import HTTPException
-from discord.ext import commands
 from discord import errors
+from discord.ext import commands
+from discord import HTTPException
 
 class ExceptionHandler(commands.Cog):
     
