@@ -5,5 +5,8 @@
 .vscode
 test
 server
-bot/utilities/marketing.py
 dependencies
+bot/utilities/marketing.py
+bot/utilities/_frameworks/anti_abuse.py
+bot/resources/major.db
+bot/resources/minor.db
