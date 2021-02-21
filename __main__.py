@@ -1,3 +1,5 @@
+import yaml
+
 from discord.ext import commands
 from discord import Intents, Game, Status
 
@@ -12,7 +14,10 @@ intents.reactions = True
 bot = commands.Bot(command_prefix=get_prefix, status=Status.online, activity= Game(f'~help'), intents = intents)
 bot.remove_command('help')
 
-parentdir = 'bot'
+with open("config.yml", "r") as file:
+    configs = yaml.load(file, Loader=yaml.SafeLoader)
+
+parentdir = configs["dirLayout"]["d"]
 for filename in listdir(f'./{parentdir}'):
 	if not filename.endswith('.py') and not filename.startswith('_') and not filename.startswith('.'):
 		for subdir in listdir(f'./{parentdir}/{filename}/'):
