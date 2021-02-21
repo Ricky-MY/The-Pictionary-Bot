@@ -1,0 +1,15 @@
+asthetics:
+    color: 0x87ceeb
+    errorColor: 0x880808
+    specialColor: 
+    majorDB: bot/resources/major.db
+    minor: bot/resources/minor.db
+
+dirLayout:
+    d: bot
+    e: administration, game, resources, utilities
+    f: _frameworks, __pycache__
+
+moderation:
+    channel: 812956440972230706
+    basePrefix: ~
