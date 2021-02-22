@@ -11,6 +11,8 @@ from bot.administration.admin import Admin
 
 intents = Intents.default()
 intents.reactions = True
+intents.members = True
+
 bot = commands.Bot(command_prefix=get_prefix, status=Status.online, activity= Game(f'~help'), intents = intents)
 bot.remove_command('help')
 
