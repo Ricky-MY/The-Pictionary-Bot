@@ -1,10 +1,15 @@
 import discord
-from discord.ext import commands
-from json import load
-
 import asyncio
 import random
+import yaml
 
+from json import load
+from datetime import datetime
+from discord.ext import commands, tasks
+
+from bot.utilities._frameworks.databases import DB
+from bot.utilities._frameworks.anti_abuse import AntiAbuse
+from bot.administration.admin import Admin
 
 class Pictionary(commands.Cog):
 
@@ -24,17 +29,19 @@ class Pictionary(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-        self.color = 0x87ceeb
+        self.watchdog = AntiAbuse()
+
         self.basic_score = 7
         self.starting_score = 0
 
-        self.channels = {}  # {guild_id: channel_id}
+        self.channels = {} # {guild_id: channel_id}
 
-        self.to_ready_up = {}  # {messageID : {user_id : bool}}
-        # {channelID : ['theme', [members], place]}
-        self.to_complete_answers = {}
+        self.to_ready_up = {}           # {messageID : {user_id : bool}}
+        self.to_complete_answers = {}   # {channelID : ['theme', [members], place]}
 
-        self.scores = {}  # {channelID : {authorID :score, authorID2 :score}}
+        self.scores = {}   # {channelID : {authorID :score, authorID2 :score}}
+        self.scotd = {}    # Scores of the day for leaderboards
+        self.latest_answers = {}
 
         self.ready_up_emoji = '🖌️'
         self.takedown_emoji = '<:takedown:806794390538027009>'
@@ -42,10 +49,28 @@ class Pictionary(commands.Cog):
         with open('./bot/resources/themes.json', 'r') as f:
             self.themes = (load(f))["words"]
 
-    @commands.command(name="log", aliases=["logger", "logging"])
-    async def logger(self, ctx):
-        await ctx.send(f"scores:{self.scores}\nto_ready_up:{self.to_ready_up}\nto_complete_answers:{self.to_complete_answers}\nchannels:{self.channels}")
+        with open("config.yml", "r") as file:
+            configs = yaml.load(file, Loader=yaml.SafeLoader)
+        self.color = configs["asthetics"]["color"]
+        self.report_channel = configs["moderation"]["channel"]
 
+        self.update_alltime_board.start()
+        self.update_daily_board.start()
+
+    '''The function below sends required data if an activity 
+    has been flagged suspicious or abusive by the anti-abuse system.'''
+
+    async def handle_abuse(self, value):
+        if value is None:
+            return
+        header, details, suspicion = value.split('|')
+        guild = discord.utils.find(
+                lambda g: g.id == 793047973751554088, self.bot.guilds)
+        channel = guild.get_channel(self.report_channel)
+        embed = discord.Embed(title=header, description= f"```yaml\n{details}```\n**Suspicion:**\n```yaml\n{suspicion}```", color = discord.Color.dark_red())
+        embed.timestamp = datetime.now()
+        await channel.send(embed = embed)
+    
     '''A lobby system is used before a game instance; that is invoked by
     the rapid-ready-up function. The function cycles through a request process
     for 50 seconds, checking whether if all players have responded and commited
@@ -79,17 +104,34 @@ class Pictionary(commands.Cog):
         inactive_members = [f'<@{key}>' for key in self.to_ready_up[message.id].keys(
         ) if self.to_ready_up[message.id][key] == False]
         inactive_members = ', '.join(z := inactive_members)
-        _ = 'are' if len(z) >= 2 else 'is'
-        await message.edit(embed=discord.Embed(title='__**# Lobby**__', description=f'{inactive_members} {_} inactive - Lobby failed to start.', color=discord.Color.dark_red()))
+        await message.edit(embed=discord.Embed(title="__**# Lobby**__", description=f"{inactive_members} {'are' if len(z) >= 2 else 'is'} inactive - Lobby failed to start.", color=discord.Color.dark_red()))
         self.to_ready_up.pop(message.id)
         self.channels.pop(ctx.guild.id)
         self.scores.pop(ctx.channel.id)
         raise asyncio.TimeoutError
 
-    '''We use the get_word function to forumulate an omitted word. This is done by
-    replacing all the characters from the theme with underscores. Although there is 
-    a minimal chance that a character stays unomitted.'''
+    '''Daily leaderboard are updated every 2 hour whilst
+    updatitive data is stored as an instant variable that gets emptied
+    once being commited into the global datbase'''
 
+    def update_leaderboard(self, scores):
+        for author in scores.keys():
+            try:
+                self.scotd[author]
+                self.latest_answers[author]
+            except KeyError:
+                self.scotd[author] = 0
+                self.latest_answers[author] = 0
+            finally:
+                self.latest_answers[author] = int(scores[author])
+                self.scotd[author] = int(self.scotd[author]) + int(scores[author])
+        return sorted(self.scotd.items(),
+                        key=lambda x: x[1], reverse=True)
+        
+    '''We use the get_word function to forumulate an omitted word. This is done by
+        replacing all the characters from the theme with underscores. Although there is 
+        a minimal chance that a character stays unomitted.'''
+    
     def get_word(self):
         theme = random.choice(self.themes)
         words_of_theme = list(theme)
@@ -112,8 +154,9 @@ class Pictionary(commands.Cog):
     player. This is done by sorting them accordingly to their scores from highest
     to lowest and pairing them up with positions by index.'''
 
-    def build_score(self, channel, members):
-        scores = sorted(self.scores[channel.id].items(),
+    async def build_score(self, guild, channel, members):
+        target = self.scores[channel.id]
+        scores = sorted(target.items(),
                         key=lambda x: x[1], reverse=True)
         embed = discord.Embed(title='__**# Scoreboard**__', color=self.color)
         places = ['🥇', '🥈', '🥉', ':four:', ':five:',
@@ -121,6 +164,8 @@ class Pictionary(commands.Cog):
         for i in range(0, len(members)):
             embed.add_field(
                 name='\u200b', value=f'{places[i]} : <@{scores[i][0]}> : {scores[i][1]} pts', inline=False)
+        await self.handle_abuse(self.watchdog.do_reality_check(target, guild.id, channel.id))
+        self.update_leaderboard(target)
         self.scores.pop(channel.id)
         return embed
 
@@ -184,7 +229,7 @@ class Pictionary(commands.Cog):
                 await channel.send("Great job! Everyone answered correctly.")
                 self.to_complete_answers.pop(channel.id)
                 return
-            if i >= (i // 2) and i % 6 == 0 and i != 0:
+            if i >= (i // 2) and i % 6 == 0 and i != 0 and len(theme) > 5:
                 for i in range(len(fake_blank)):
                     if (fake_blank[i] != list(theme_copy)[i]) and (not changed) and (list(theme_copy)[i] != ' '):
                         fake_blank[i] = list(theme_copy)[i]
@@ -196,8 +241,7 @@ class Pictionary(commands.Cog):
         if len(z := data[1]) > 0:
             unanswered = [f'{i.mention}' for i in data[1]]
             text = ', '.join(unanswered)
-            _ = 'have' if len(z) >= 2 else 'has'
-            await channel.send(f"{text} {_} failed to answer correctly. What a let down fellas :p. The theme was {theme}")
+            await channel.send(f"{text} {'have' if len(z) >= 2 else 'has'} failed to answer correctly. What a let down fellas :p. The theme was {theme}")
         try:
             self.to_complete_answers.pop(channel.id)
         except KeyError:
@@ -240,9 +284,8 @@ class Pictionary(commands.Cog):
                         user_list = await target_reaction.users().flatten()
                         sd_people = ', '.join(
                             v := [i.mention for i in [user for user in user_list if user != self.bot.user] if i.id in self.to_ready_up[message.id].keys()])
-                        _ = 'have' if len(v) >= 2 else 'has'
 
-                        await message.edit(embed=discord.Embed(title='__**# Force Stop**__', description=f'{sd_people} {_} voted to force stop the match.', color=discord.Color.dark_red()))
+                        await message.edit(embed=discord.Embed(title='__**# Force Stop**__', description=f"{sd_people} {'have' if len(v) >= 2 else 'has'} voted to force stop the match.", color=discord.Color.dark_red()))
                         self.to_ready_up.pop(message.id)
                         self.scores.pop(payload.channel_id)
                         self.channels.pop(guild.id)
@@ -277,10 +320,13 @@ class Pictionary(commands.Cog):
 
         self.channels[ctx.guild.id] = ctx.channel.id
         channel = ctx.channel
+        guild = ctx.guild
         DRAWING_TIME = draw_time
         GUESSING_TIME = guess_time
         BASIC_SCORE = 10
         lobby_init = await ctx.send(embed=discord.Embed(title='__**# Lobby**__', description=f'> Starting in 3 seconds...\n> \n> Guess Time = {guess_time} seconds\n> \n> Drawing Time = {draw_time} seconds\n> \n> No of Participants = {len(members)}', color=self.color))
+        self.watchdog.start_watching_session(guild.id, channel.id, rounds, members)
+        await self.handle_abuse(self.watchdog.do_entrance_check(guild.id, channel.id))
         await asyncio.sleep(3)
 
         # Rapid ready-up protocol
@@ -310,12 +356,11 @@ class Pictionary(commands.Cog):
                     self.scores[channel.id][member.id] -= BASIC_SCORE
                 else:
                     await self.get_answers_from_players(message, channel, theme, blank, members, member, GUESSING_TIME)
-        embed = self.build_score(channel, members)
+        embed = await self.build_score(guild, channel, members)
         await channel.send(embed=embed)
         self.channels.pop(ctx.guild.id)
-        print(self.channels)
-        print(self.to_complete_answers)
-        print(self.to_ready_up)
+        await self.handle_abuse(self.watchdog.do_exit_check(guild.id, channel.id, lobby_init.id, [self.channels, self.to_ready_up, self.to_complete_answers, self.scores]))
+        self.watchdog.end_watching_session(guild.id, channel.id)
 
     @start.command()
     @commands.bot_has_permissions(manage_messages=True)
@@ -332,6 +377,23 @@ class Pictionary(commands.Cog):
             guess_time = 5
         await self.normal(ctx, 2, members, draw_time, guess_time)
 
+    @commands.command(name="log", aliases=["logger", "logging"])
+    @commands.check(Admin.botAdminCheck)
+    async def logger(self, ctx):
+        await ctx.send(f"scores:{self.scores}\ntoReadyUp:{self.to_ready_up}\ntoCompleteAnswers:{self.to_complete_answers}\nchannels:{self.channels}\nscoresOfTheDay:{self.scotd}")
+ 
+    @tasks.loop(hours = 2)
+    async def update_daily_board(self):
+        async with DB('bot/resources/major.db') as cont:
+            await cont.update_value("daily_boards", self.latest_answers)
+        self.latest_answers = {}
+
+    @tasks.loop(hours=24)
+    async def update_alltime_board(self):
+        async with DB('bot/resources/major.db') as ctx:
+            await ctx.update_value("all_time_leaderboards", self.scotd)
+        self.scotd = {}
+        
 def setup(bot):
     bot.add_cog(Pictionary(bot))
     print('Pictionary.cog is loaded')
