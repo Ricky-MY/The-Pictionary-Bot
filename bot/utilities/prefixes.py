@@ -1,42 +1,39 @@
 import discord
+import yaml
+
 from discord.ext import commands
-import json
 
-prefixes_directory = 'bot/resources/prefixes.json'
-
+from bot.utilities._frameworks.databases import PrefixHandler, sync_handle_prefixes
 
 def get_prefix(bot, message):
-    with open(prefixes_directory, 'r') as f:
-        prefixes = json.load(f)
-    try:
-        return commands.when_mentioned_or(prefixes[str(message.guild.id)])(bot, message)
-    except KeyError:
-        with open(prefixes_directory, 'r') as f:
-            prefixes = json.load(f)
-        prefixes[str(message.guild.id)] = "~"
-        with open(prefixes_directory, 'w') as f:
-            json.dump(prefixes, f, indent=4)
-        return commands.when_mentioned_or(prefixes[str(message.guild.id)])(bot, message)
-    except AttributeError:
-        return ['~']
+    if message.guild is None:
+        return "~"
+    elif message.guild is not None:
+        with sync_handle_prefixes("bot/resources/minor.db") as cont:
+            return commands.when_mentioned_or(cont.get_value("prefixes", message.guild.id))(bot, message)
+
+async def get_real_prefix(guild_id):
+    directory = "bot/resources/minor.db"
+    async with PrefixHandler(directory) as cont:
+        return await cont.get_value("prefixes", guild_id)
 
 class Prefixes(commands.Cog):
-
     '''Basic class to handle custom prefixes'''
 
     def __init__(self, bot):
         self.bot = bot
-        self.color = 0x87ceeb
-        self.prefixes_directory = prefixes_directory
 
+        with open("config.yml", "r") as file:
+            configs = yaml.load(file, Loader=yaml.SafeLoader)
+        self.color = configs["asthetics"]["blushColor"]
+
+        self.minor_dir = configs["moderation"]["minor"]
+        
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
+        async with PrefixHandler(self.directory) as cont:
+            await cont.update_value("prefixes", {guild.id: "~"})
         return
-        with open(self.prefixes_directory, 'r') as f:
-            prefixes = json.load(f)
-        prefixes[str(guild.id)] = "~"
-        with open(self.prefixes_directory, 'w') as f:
-            json.dump(prefixes, f, indent=4)
         async for entry in guild.audit_logs(action=discord.AuditLogAction.bot_add):
             if entry.target == self.bot.user:
                 embed = discord.Embed(
@@ -55,30 +52,28 @@ class Prefixes(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
-        with open(self.prefixes_directory, 'r') as f:
-            prefixes = json.load(f)
-        prefixes.pop(str(guild.id))
-        with open(self.prefixes_directory, 'w') as f:
-            json.dump(prefixes, f, indent=4)
+        async with PrefixHandler(self.minor_dir) as ctx:
+            await ctx.delete_value("prefixes", guild.id)
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if '<@!769198596339269643>' == message.content:
+            await self.prefix(message)
 
     # Prefix finding Command
     @commands.group(invoke_without_command=True)
     @commands.guild_only()
     async def prefix(self, ctx):
-        with open(self.prefixes_directory, 'r') as f:
-            prefixes = json.load(f)
+        prefix = await get_real_prefix(ctx.guild.id)
         embed = discord.Embed(
-            title=f"Preset", description=f"CURRENT SERVER PREFIX : \n1. '`{prefixes[str(ctx.guild.id)]}`' \n2.{ctx.guild.me.mention}\nExecute `{prefixes[str(ctx.guild.id)]}prefix change <new_prefix>` command to change prefixes!", colour=self.color)
-        await ctx.send(embed=embed)
+            title=f"Preset", description=f"CURRENT SERVER PREFIX : \n1. '`{prefix}`' \n2.{ctx.guild.me.mention}\nExecute `{prefix}prefix change <new_prefix>` command to change prefixes!", colour=self.color)
+        await ctx.channel.send(embed=embed)
 
     @prefix.command()
     @commands.guild_only()
     async def change(self, ctx, prefix):
-        with open(self.prefixes_directory, 'r') as f:
-            prefixes = json.load(f)
-        prefixes[str(ctx.guild.id)] = str(prefix)
-        with open(self.prefixes_directory, 'w') as f:
-            json.dump(prefixes, f, indent=4)
+        async with PrefixHandler(self.minor_dir) as cont:
+            await cont.update_value("prefixes", {ctx.guild.id: prefix})
         embed = discord.Embed(
             title=f"Success!", description=f'PREFIX SUCCESSFULLY CHANGED INTO : `{prefix}`\nExecute `{prefix}prefix` command to check the local prefix anytime!', colour=self.color)
         await ctx.send(embed=embed)

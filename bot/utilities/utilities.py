@@ -1,11 +1,20 @@
 import discord
+import yaml
+
 from discord.ext import commands, menus
+
+from bot.utilities._frameworks.paginator import Paginator
 
 class Util(commands.Cog):
 
+    ''' Interactable utilities commands subclass '''
+
     def __init__(self, bot):
         self.bot = bot
-        self.color = 0x87ceeb
+
+        with open("config.yml", "r") as file:
+            configs = yaml.load(file, Loader=yaml.SafeLoader)
+        self.color = configs["asthetics"]["blushColor"]
 
     @commands.command(name= "feedback", aliases = ['fb', 'report'])
     async def feedback(self, ctx, *, feedback):

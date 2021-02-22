@@ -1,15 +1,20 @@
+# The asthetic configuration for the bot
 asthetics:
-    color: 0x87ceeb
+    color: 0x7DF9FF
     errorColor: 0x880808
-    specialColor: 
-    majorDB: bot/resources/major.db
-    minor: bot/resources/minor.db
+    specialColor: 0xe1bd27
+    menuColor: 0x01fe03
+    blushColor: 0xde5d83
 
+# The directory layout for importing purposes d < e < f
 dirLayout:
     d: bot
     e: administration, game, resources, utilities
     f: _frameworks, __pycache__
 
+# Moderation and system related configurations
 moderation:
     channel: 812956440972230706
     basePrefix: ~
+    major: bot/resources/major.db
+    minor: bot/resources/minor.db
