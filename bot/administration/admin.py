@@ -1,9 +1,15 @@
+import asyncio
+import aiohttp
 import discord
 import json
+
+import yaml
 
 from os import listdir
 from discord.ext import commands
 from discord.ext.commands.errors import ExtensionNotFound, ExtensionNotLoaded
+
+from bot.utilities._frameworks.databases import PrefixHandler
 
 class Admin(commands.Cog):
 	
@@ -15,11 +21,59 @@ class Admin(commands.Cog):
 
 	def __init__(self, bot):
 		self.bot = bot
-		self.color = 0x87ceeb
-		self.main_directory = 'bot'
+		with open("config.yml", "r") as file:
+			configs = yaml.load(file, Loader=yaml.SafeLoader)
+		self.color = configs["asthetics"]["menuColor"]
+		self.main_directory = configs["dirLayout"]["d"]
 
 	def botAdminCheck(ctx):
 		return ctx.message.author.id == 368671236370464769 # change this number to your ID
+
+	'''Prototypes ; Ignore the following code'''
+
+	@commands.command(name = "web", aliases=['wbt'])
+	@commands.guild_only()
+	@commands.check(botAdminCheck)
+	async def web_server_test(self, ctx):
+		base = "http://127.0.0.1:5000/text"
+		link = f"{ctx.channel.id}/{ctx.author.id}"
+		await ctx.send("Please go to this website: "+base+link)
+		await asyncio.sleep(10)
+		async with aiohttp.ClientSession() as session:
+			async with session.get(f'{base}/api/get/{ctx.channel.id}/{ctx.author.id}') as resp:
+				if resp.status == 200:
+					if resp:
+						await ctx.send(await resp.text())
+					else:
+						print(resp)
+
+	@commands.command(name = "web2", aliases=['wbt2'])
+	@commands.guild_only()
+	@commands.check(botAdminCheck)
+	async def web_server_test2(self, ctx):
+		base = "http://127.0.0.1:5000/draw"
+		link = f"{ctx.channel.id}/{ctx.author.id}"
+		await ctx.send("Please go to this website: "+base+link)
+		await asyncio.sleep(10)
+		async with aiohttp.ClientSession() as session:
+			async with session.get(f'{base}/api/get/{ctx.channel.id}/{ctx.author.id}') as resp:
+				if resp.status == 200:
+					if resp:
+						await ctx.send(await resp.text())
+					else:
+						print(resp)
+
+	@commands.command(name = "import_prefixes", aliases=['impre'])
+	@commands.guild_only()
+	@commands.check(botAdminCheck)
+	async def import_prefixes(self, ctx):
+		with open("toimport.json", "r") as f:
+			prefixes = json.load(f)
+		
+		for guild_id in prefixes.keys():
+			async with PrefixHandler("bot/resources/minor.db") as cont:
+				await cont.update_value("prefixes", {guild_id: prefixes[guild_id]})
+		await ctx.send("Prefixes imported")
 
 	'''Pushing and publishing updates and threads to 
 	guild owners, this part should be ignored'''
@@ -59,7 +113,6 @@ class Admin(commands.Cog):
 
 	'''Utility commands to provide administrator access on the bot'''
 
-	# Guilds Checker
 	@commands.command(name="guilds")
 	@commands.guild_only()
 	@commands.check(botAdminCheck)
@@ -70,6 +123,16 @@ class Admin(commands.Cog):
 		embed.set_footer(text=f'Total of {len(guilds)} guild(s) joined')
 		await ctx.send(embed=embed)
 		await self.bot.change_presence(status=discord.Status.online, activity=discord.Game(f'~help | {len(self.bot.guilds)} guilds'))
+
+	@commands.command(name="members")
+	@commands.guild_only()
+	@commands.check(botAdminCheck)
+	async def members(self, ctx):
+		count = 0
+		for guild in self.bot.guilds:
+			count += len(guild.members)
+		await ctx.send(embed=discord.Embed(title="Amount of members play pictionary:", description = f"**{count}**", color = self.color))
+		await self.bot.change_presence(status=discord.Status.online, activity=discord.Game(f'with {count} members | ~help '))
 
 	# Load Unload and Reload command
 	@commands.command(name="load", aliases=['l'])
