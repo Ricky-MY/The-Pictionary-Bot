@@ -1,8 +1,8 @@
 import traceback
 import sys
+import yaml
 
 from discord import Embed
-from discord import Color
 from discord import errors
 from discord.ext import commands
 from discord import HTTPException
@@ -11,8 +11,11 @@ class ExceptionHandler(commands.Cog):
     
     def __init__(self, bot):
         self.bot = bot
-        self.color = 0xC0C0C0
-        self.error_color = Color.dark_red()
+        
+        with open("config.yml", "r") as file:
+            configs = yaml.load(file, Loader=yaml.SafeLoader)
+        self.color = configs["asthetics"]["color"]
+        self.error_color = configs["asthetics"]["errorColor"]
 
     '''Basic discord exception handler'''
     
@@ -65,6 +68,8 @@ class ExceptionHandler(commands.Cog):
                     await ctx.send("⚠️ Extension is not loaded.")
                 elif isinstance(error, commands.ExtensionAlreadyLoaded):
                     await ctx.send("⚠️ Extension has been already loaded.")
+                elif isinstance(error, commands.errors.CheckFailure):
+                    pass
                 else:
                     await self.raise_norm(ctx, error)
 
