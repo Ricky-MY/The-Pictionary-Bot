@@ -18,25 +18,25 @@ Started: 1/10/2020
           +--------------+           +-------------+           +-----------------+    +-------------------------------+
  start -> |              |---------->|    Create   |---------->|  Update         | <--| - on_raw_reaction + a checker |
           |   Lobbying   |           |  Attendance |           |  attendance list|    +-------------------------------+
-  end  <- |              |<----------|   List      |<----------|  on user input  |                                  
-          +--------------+           +-------------+  takedown +-----------------+                                  
+  end  <- |              |<----------|   List      |<----------|  on user input  |
+          +--------------+           +-------------+  takedown +-----------------+
                                                                         |
                                                                         | - all users responded
                                                                         V
                                                                +--------------+
-                                                       +------>|    Get       | 
+                                                       +------>|    Get       |
                                                        |       |  Drawing     |
                                                        |       +--------------+
                         +--------------+               |              |
               end  <----|  build and   |<--------------+              |
                         |output scores |      ^        |              V
                         +--------------+      |        |        +-------------+    +------------------+
-                                              |        |        |  Create or  |--->|  on_message to   |     
+                                              |        |        |  Create or  |--->|  on_message to   |
                             after all members |        +--------|  update     |<---| recieve answers  |
-                       .----------------------+                 | check list  |    +------------------+  
-                                                                +-------------+ 
+                       .----------------------+                 | check list  |    +------------------+
+                                                                +-------------+
 ~~~
-### Wordy Explanation 
+### Wordy Explanation
 **1.** When a lobby is initiated**(start_game command used)**, every participant is required to **prove** their **activity**. This, as of the latest update, is recoginized as reacting to the lobby message with 🖌️. If any of the participants **fail** to prove activity within `30` seconds, the game will consequently fail to start. Players can also vote for take-down using the emoji TAKEDOWN.
 
 **2.** After **every** participant have proven their activity, the game will begin after 5 seconds. Chat will be **disabled** until the first drawing is submitted.
@@ -93,5 +93,5 @@ d. Insert in your token
 TOKEN="YOUR_TOKEN"
 ~~~
 
-**That is all you need to run this project. If you want to try out a pre-hosted bot, please navigate to this website https://top.gg/bot/768442873561481216** 
+**That is all you need to run this project. If you want to try out a pre-hosted bot, please navigate to this website https://top.gg/bot/768442873561481216**
 
