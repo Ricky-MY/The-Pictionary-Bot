@@ -4,6 +4,9 @@ __*
 *.json
 .env
 
+# local dependencies
+dependencies
+
 # Anti Hack or sensitive modules
 bot/utils/anti_abuse.py
 bot/extensions/utils/marketing.py
