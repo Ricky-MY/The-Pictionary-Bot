@@ -1,12 +1,9 @@
-*.txt
-*.pyc
+# PYcache and accessories
+__*
+*.db
 *.json
 .env
-.vscode
-test
-server
-dependencies
-bot/utilities/marketing.py
-bot/utilities/_frameworks/anti_abuse.py
-bot/resources/major.db
-bot/resources/minor.db
+
+# Anti Hack or sensitive modules
+bot/utils/anti_abuse.py
+bot/extensions/utils/marketing.py
